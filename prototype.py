@@ -199,20 +199,40 @@ if uploaded_file is not None:
 
     try:
 
-        if uploaded_file.name.endswith(".csv"):
+        if uploaded_file.name.endswith(".xlsx"):
 
-            df = pd.read_csv(uploaded_file)
+            df = pd.read_excel(
+                uploaded_file
+            )
 
         else:
 
-            df = pd.read_excel(uploaded_file)
+            try:
+
+                df = pd.read_csv(
+                    uploaded_file,
+                    sep=",",
+                    on_bad_lines="skip"
+                )
+
+            except:
+
+                uploaded_file.seek(0)
+
+                df = pd.read_csv(
+                    uploaded_file,
+                    sep=";",
+                    on_bad_lines="skip"
+                )
+
+        st.success(
+            f"Dataset berhasil dimuat ({len(df)} data)"
+        )
 
         review_col = st.selectbox(
             "Pilih Kolom Review",
             df.columns
         )
-
-        st.dataframe(df.head())
 
     except Exception as e:
 
@@ -220,10 +240,12 @@ if uploaded_file is not None:
             f"Gagal membaca file: {e}"
         )
 
+        st.stop()
+
 else:
 
     st.info(
-        "Silakan upload dataset terlebih dahulu"
+        "Upload dataset terlebih dahulu"
     )
 
     st.stop()
