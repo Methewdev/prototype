@@ -1,48 +1,52 @@
+# =====================================================
+# INUT LIBRARY
+# ===================================================== 
 import streamlit as st
 import pandas as pd
 import numpy as np
 import re
 import torch
-import plotly.express as px
 
 from transformers import (
+    pipeline,
     AutoTokenizer,
     AutoModel
 )
 
+from deep_translator import GoogleTranslator
+
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
 
-# =====================================================
-# CONFIG
-# =====================================================
+from sklearn.decomposition import PCA
 
-st.set_page_config(
-    page_title="Livin NLP Pipeline",
-    page_icon="📊",
-    layout="wide"
-)
-
-st.title("📊 Livin NLP Pipeline Prototype")
-
-st.markdown("""
-Prototype untuk menunjukkan proses NLP:
-
-Review
-→ Cleaning
-→ Case Folding
-→ Normalization
-→ Tokenization
-→ Stopword Removal
-→ Stemming
-→ Tokenizer IndoBERT
-→ Embedding IndoBERT
-""")
+import plotly.express as px
 
 # =====================================================
-# LOAD INDOBERT
-# =====================================================
+# Load Teacher Sentiment
+# ===================================================== 
+@st.cache_resource
+def load_sentiment_teacher():
 
+    return pipeline(
+        "text-classification",
+        model="mdhugol/indonesia-bert-sentiment-classification"
+    )
+	
+# =====================================================
+# Load Teacher Emotion
+# ===================================================== 
+@st.cache_resource
+def load_emotion_teacher():
+
+    return pipeline(
+        "text-classification",
+        model="SamLowe/roberta-base-go_emotions"
+    )
+	
+# =====================================================
+# Load IndoBERT
+# ===================================================== 
 @st.cache_resource
 def load_indobert():
 
@@ -55,83 +59,76 @@ def load_indobert():
     )
 
     return tokenizer, model
+	
+# =====================================================
+# Mapping Sentiment
+# ===================================================== 
+
+sentiment_map = {
+    "LABEL_0": "Positive",
+    "LABEL_1": "Neutral",
+    "LABEL_2": "Negative"
+}
 
 # =====================================================
-# NORMALIZATION DICTIONARY
-# =====================================================
+# Mapping Emotion
+# ===================================================== 
 
-normalization_dict = {
+emotion_mapping = {
 
-    "gk": "tidak",
-    "ga": "tidak",
-    "yg": "yang",
-    "bgt": "banget",
-    "udh": "sudah",
-    "tp": "tapi",
-    "dgn": "dengan",
-    "krn": "karena",
-    "dr": "dari",
-    "pd": "pada"
+    "joy": "Senang",
+    "admiration": "Senang",
+    "approval": "Senang",
+    "gratitude": "Senang",
+
+    "anger": "Marah",
+    "annoyance": "Marah",
+    "disapproval": "Marah",
+
+    "sadness": "Sedih",
+    "grief": "Sedih",
+    "disappointment": "Sedih",
+
+    "frustration": "Frustasi",
+    "confusion": "Frustasi",
+    "fear": "Frustasi"
 
 }
 
 # =====================================================
-# STOPWORD
-# =====================================================
-
-stop_factory = StopWordRemoverFactory()
-
-stop_words = set(
-    stop_factory.get_stop_words()
-)
-
-# =====================================================
-# STEMMER
-# =====================================================
-
-stem_factory = StemmerFactory()
-
-stemmer = stem_factory.create_stemmer()
-
-# =====================================================
-# PREPROCESSING FUNCTIONS
-# =====================================================
-
+# Preprocessing
+# ===================================================== 
 def cleaning(text):
 
     text = str(text)
 
-    text = re.sub(
-        r"http\S+",
-        "",
-        text
-    )
+    text = re.sub(r"http\S+","",text)
 
-    text = re.sub(
-        r"www\S+",
-        "",
-        text
-    )
+    text = re.sub(r"www\S+","",text)
 
-    text = re.sub(
-        r"[^a-zA-Z\s]",
-        " ",
-        text
-    )
+    text = re.sub(r"[^a-zA-Z\s]"," ",text)
 
-    text = re.sub(
-        r"\s+",
-        " ",
-        text
-    )
+    text = re.sub(r"\s+"," ",text)
 
     return text.strip()
-
-
+	
+# =====================================================
+# Case Folding
+# ===================================================== 
 def case_folding(text):
-
     return text.lower()
+	
+# =====================================================
+# Normalization
+# ===================================================== 	
 
+normalization_dict = {
+    "gk":"tidak",
+    "ga":"tidak",
+    "yg":"yang",
+    "bgt":"banget",
+    "udh":"sudah"
+}
 
 def normalize(text):
 
@@ -147,12 +144,24 @@ def normalize(text):
 
     return " ".join(words)
 
-
+# =====================================================
+# Tokenize
+# ===================================================== 
 def tokenize(text):
-
     return text.split()
+	
+# =====================================================
+# Stop_Word
+# ===================================================== 
 
+stop_words = set(
+    StopWordRemoverFactory()
+    .get_stop_words()
+)
 
+# =====================================================
+# Remove_Word
+# ===================================================== 
 def remove_stopwords(tokens):
 
     return [
@@ -161,6 +170,14 @@ def remove_stopwords(tokens):
         if word not in stop_words
     ]
 
+# =====================================================
+# Stemmer
+# ===================================================== 
+
+stemmer = (
+    StemmerFactory()
+    .create_stemmer()
+)
 
 def stemming(tokens):
 
@@ -168,308 +185,199 @@ def stemming(tokens):
         stemmer.stem(word)
         for word in tokens
     ]
-
+	
+	
 # =====================================================
-# UPLOAD FILE
-# =====================================================
-
+# Upload Dataset
+# ===================================================== 
 uploaded_file = st.file_uploader(
-    "Upload CSV / XLSX",
-    type=["csv", "xlsx"]
+    "Upload CSV/XLSX",
+    type=["csv","xlsx"]
+)
+if uploaded_file:
+
+    if uploaded_file.name.endswith(".csv"):
+        df = pd.read_csv(uploaded_file)
+    else:
+        df = pd.read_excel(uploaded_file)
+		
+# =====================================================
+# Pilih Kolom Review
+# ===================================================== 
+
+review_col = st.selectbox(
+    "Pilih Kolom Review",
+    df.columns
 )
 
-if uploaded_file:
+# =====================================================
+# Generate Report
+# ===================================================== 
+
+df["cleaning"] = df[review_col].apply(cleaning)
+
+df["casefold"] = df["cleaning"].apply(case_folding)
+
+df["normalisasi"] = df["casefold"].apply(normalize)
+
+df["token"] = df["normalisasi"].apply(tokenize)
+
+df["stopword"] = df["token"].apply(remove_stopwords)
+
+df["stemming"] = df["stopword"].apply(stemming)
+
+df["final_text"] = df["stemming"].apply(
+    lambda x: " ".join(x)
+)
+
+# =====================================================
+# Teacher Sentiment
+# ===================================================== 
+teacher_sentiment = load_sentiment_teacher()
+
+df["teacher_sentiment"] = df["final_text"].apply(
+
+    lambda x:
+    sentiment_map[
+        teacher_sentiment(x)[0]["label"]
+    ]
+
+)
+# =====================================================
+# Teacher Emotion
+# ===================================================== 
+teacher_emotion = load_emotion_teacher()
+
+# =====================================================
+# Translate
+# ===================================================== 
+
+def translate_text(text):
 
     try:
 
-        if uploaded_file.name.endswith(".csv"):
+        return GoogleTranslator(
+            source="id",
+            target="en"
+        ).translate(text)
 
-            df = pd.read_csv(
-                uploaded_file
-            )
+    except:
 
-        else:
+        return text
+df["translated"] = df["final_text"].apply(
+    translate_text
+)
 
-            df = pd.read_excel(
-                uploaded_file
-            )
+# =====================================================
+# Emotion
+# ===================================================== 
 
-        st.success(
-            "Dataset berhasil diupload"
-        )
+def predict_emotion(text):
 
-    except Exception as e:
+    result = teacher_emotion(text)[0]
 
-        st.error(
-            f"Error : {e}"
-        )
+    emotion = result["label"]
 
-        st.stop()
-
-    review_col = st.selectbox(
-        "Pilih Kolom Review",
-        df.columns
+    return emotion_mapping.get(
+        emotion,
+        "Frustasi"
     )
+	df["teacher_emotion"] = df[
+    "translated"
+].apply(
+    predict_emotion
+)
 
-    # =================================================
-    # PREPROCESSING
-    # =================================================
+# =====================================================
+# Tokenizer IndoBERT Tab
+# ===================================================== 
+tokenizer, model = load_indobert()
 
-    df["cleaning"] = df[
-        review_col
-    ].apply(cleaning)
+sample = df["final_text"].iloc[0]
 
-    df["casefold"] = df[
-        "cleaning"
-    ].apply(case_folding)
+encoded = tokenizer(
+    sample,
+    truncation=True,
+    max_length=128
+)
+tokenizer.tokenize(sample)
 
-    df["normalisasi"] = df[
-        "casefold"
-    ].apply(normalize)
+encoded["input_ids"]
 
-    df["token"] = df[
-        "normalisasi"
-    ].apply(tokenize)
+encoded["attention_mask"]
 
-    df["stopword"] = df[
-        "token"
-    ].apply(remove_stopwords)
 
-    df["stemming"] = df[
-        "stopword"
-    ].apply(stemming)
+# =====================================================
+# Embedding Tab
+# ===================================================== 
 
-    df["final_text"] = df[
-        "stemming"
-    ].apply(
-        lambda x: " ".join(x)
+inputs = tokenizer(
+    sample,
+    return_tensors="pt"
+)
+with torch.no_grad():
+
+    outputs = model(
+        **inputs
     )
+	
+# =====================================================
+# CLS Embedding:
+# ===================================================== 
+cls_embedding = (
+    outputs.last_hidden_state[:,0,:]
+)
+cls_embedding.shape
 
-    # =================================================
-    # TABS
-    # =================================================
+# =====================================================
+# Visualisasi PCA:
+# ===================================================== 
+emb = cls_embedding.cpu().numpy()
 
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+pca = PCA(
+    n_components=2
+)
 
-        "📊 Data Understanding",
-        "🧹 Preprocessing",
-        "🤖 Tokenizer IndoBERT",
-        "🔢 Embedding IndoBERT",
-        "📈 Dashboard"
+result = pca.fit_transform(
+    emb
+)
+pca_df = pd.DataFrame(
+    result,
+    columns=["PC1","PC2"]
+)
+fig = px.scatter(
+    pca_df,
+    x="PC1",
+    y="PC2"
+)
 
-    ])
+st.plotly_chart(fig)
 
-    # =================================================
-    # TAB 1
-    # =================================================
+# =====================================================
+# Dashboard Sentiment
+# ===================================================== 
+fig1 = px.pie(
+    df,
+    names="teacher_sentiment"
+)
+# =====================================================
+# Dashboard Emotion
+# ===================================================== 
 
-    with tab1:
+fig2 = px.bar(
+    df["teacher_emotion"]
+      .value_counts()
+      .reset_index(),
+    x="teacher_emotion",
+    y="count"
+)
 
-        st.subheader(
-            "Dataset Overview"
-        )
+# =====================================================
+# Crosstab
+# =====================================================
+ cross = pd.crosstab(
+    df["teacher_sentiment"],
+    df["teacher_emotion"]
+)
 
-        col1, col2 = st.columns(2)
-
-        col1.metric(
-            "Jumlah Review",
-            len(df)
-        )
-
-        col2.metric(
-            "Jumlah Kolom",
-            len(df.columns)
-        )
-
-        st.dataframe(
-            df.head()
-        )
-
-    # =================================================
-    # TAB 2
-    # =================================================
-
-    with tab2:
-
-        st.subheader(
-            "Hasil Preprocessing"
-        )
-
-        st.dataframe(
-
-            df[
-                [
-                    review_col,
-                    "cleaning",
-                    "casefold",
-                    "normalisasi",
-                    "token",
-                    "stopword",
-                    "stemming",
-                    "final_text"
-                ]
-            ].head(20)
-
-        )
-
-    # =================================================
-    # TAB 3
-    # =================================================
-
-    with tab3:
-
-        tokenizer, model = (
-            load_indobert()
-        )
-
-        sample = df[
-            "final_text"
-        ].iloc[0]
-
-        st.subheader(
-            "Sample Review"
-        )
-
-        st.code(sample)
-
-        st.subheader(
-            "Tokens"
-        )
-
-        st.write(
-            tokenizer.tokenize(
-                sample
-            )
-        )
-
-        encoded = tokenizer(
-            sample,
-            truncation=True,
-            max_length=128
-        )
-
-        st.subheader(
-            "Input IDs"
-        )
-
-        st.write(
-            encoded["input_ids"]
-        )
-
-        st.subheader(
-            "Attention Mask"
-        )
-
-        st.write(
-            encoded["attention_mask"]
-        )
-
-    # =================================================
-    # TAB 4
-    # =================================================
-
-    with tab4:
-
-        inputs = tokenizer(
-            sample,
-            return_tensors="pt"
-        )
-
-        with torch.no_grad():
-
-            outputs = model(
-                **inputs
-            )
-
-        embedding = (
-            outputs.last_hidden_state
-        )
-
-        st.subheader(
-            "Embedding Shape"
-        )
-
-        st.write(
-            embedding.shape
-        )
-
-        st.info("""
-        Penjelasan:
-
-        Baris pertama:
-        jumlah token
-
-        Kolom:
-        768 dimensi embedding IndoBERT
-        """)
-
-        emb_df = pd.DataFrame(
-
-            embedding[0]
-            .cpu()
-            .numpy()
-
-        )
-
-        st.subheader(
-            "Embedding Matrix"
-        )
-
-        st.dataframe(
-            emb_df
-        )
-
-    # =================================================
-    # TAB 5
-    # =================================================
-
-    with tab5:
-
-        st.subheader(
-            "Panjang Review"
-        )
-
-        df["length"] = df[
-            review_col
-        ].astype(str).apply(len)
-
-        fig = px.histogram(
-            df,
-            x="length",
-            nbins=20,
-            title="Distribusi Panjang Review"
-        )
-
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
-
-        st.subheader(
-            "Top 20 Kata"
-        )
-
-        words = " ".join(
-            df["final_text"]
-        ).split()
-
-        word_freq = pd.Series(
-            words
-        ).value_counts()
-
-        st.dataframe(
-            word_freq
-            .head(20)
-            .reset_index()
-            .rename(
-                columns={
-                    "index":"Kata",
-                    0:"Frekuensi"
-                }
-            )
-        )
-
-        st.success("""
-        Pipeline NLP berhasil dijalankan
-        hingga Embedding IndoBERT.
-        """)
+st.dataframe(cross)
