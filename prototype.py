@@ -255,7 +255,8 @@ else:
 
 review_col = st.selectbox(
     "Pilih Kolom Review",
-    df.columns
+    df.columns,
+    key="review_col"
 )
 
 # =====================================================
