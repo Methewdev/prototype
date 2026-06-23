@@ -385,9 +385,13 @@ fig2 = px.bar(
 # =====================================================
 # Crosstab
 # =====================================================
- cross = pd.crosstab(
-    df["teacher_sentiment"],
-    df["teacher_emotion"]
-)
+with tab7:
 
-st.dataframe(cross)
+    st.plotly_chart(fig1)
+
+    cross = pd.crosstab(
+        df["teacher_sentiment"],
+        df["teacher_emotion"]
+    )
+
+    st.dataframe(cross)
