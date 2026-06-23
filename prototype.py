@@ -191,31 +191,63 @@ def stemming(tokens):
 # Upload Dataset
 # ===================================================== 
 uploaded_file = st.file_uploader(
-    "Upload Dataset",
+    "Upload CSV / XLSX",
     type=["csv", "xlsx"]
 )
 
 if uploaded_file is not None:
 
-    if uploaded_file.name.endswith(".csv"):
-        df = pd.read_csv(uploaded_file)
-    else:
-        df = pd.read_excel(uploaded_file)
+    try:
 
-    review_col = st.selectbox(
-        "Pilih Kolom Review",
-        df.columns
-    )
+        if uploaded_file.name.endswith(".xlsx"):
 
-    st.dataframe(df.head())
+            df = pd.read_excel(
+                uploaded_file,
+                engine="openpyxl"
+            )
 
-else:
+        else:
 
-    st.info(
-        "Silakan upload dataset terlebih dahulu"
-    )
+            try:
 
-    st.stop()
+                df = pd.read_csv(
+                    uploaded_file,
+                    encoding="utf-8"
+                )
+
+            except:
+
+                uploaded_file.seek(0)
+
+                try:
+
+                    df = pd.read_csv(
+                        uploaded_file,
+                        sep=";"
+                    )
+
+                except:
+
+                    uploaded_file.seek(0)
+
+                    df = pd.read_csv(
+                        uploaded_file,
+                        encoding="latin1"
+                    )
+
+        st.success(
+            f"Dataset berhasil dimuat ({len(df)} baris)"
+        )
+
+        st.dataframe(df.head())
+
+    except Exception as e:
+
+        st.error(
+            f"Gagal membaca file: {e}"
+        )
+
+        st.stop()
 # =====================================================
 # Pilih Kolom Review
 # ===================================================== 
