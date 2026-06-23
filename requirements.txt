@@ -9,3 +9,5 @@ sastrawi
 sentencepiece
 accelerate
 safetensors
+deep-translator
+scikit-learn
