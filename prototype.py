@@ -282,10 +282,20 @@ def predict_emotion(text):
         emotion,
         "Frustasi"
     )
-	df["teacher_emotion"] = df[
-    "translated"
-].apply(
-    predict_emotion
+def predict_emotion(text):
+
+    result = teacher_emotion(text)[0]
+
+    emotion = result["label"]
+
+    return emotion_mapping.get(
+        emotion,
+        "Frustasi"
+    )
+
+df["teacher_emotion"] = (
+    df["translated"]
+    .apply(predict_emotion)
 )
 
 # =====================================================
