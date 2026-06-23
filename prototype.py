@@ -191,16 +191,31 @@ def stemming(tokens):
 # Upload Dataset
 # ===================================================== 
 uploaded_file = st.file_uploader(
-    "Upload CSV/XLSX",
-    type=["csv","xlsx"]
+    "Upload Dataset",
+    type=["csv", "xlsx"]
 )
-if uploaded_file:
+
+if uploaded_file is not None:
 
     if uploaded_file.name.endswith(".csv"):
         df = pd.read_csv(uploaded_file)
     else:
         df = pd.read_excel(uploaded_file)
-		
+
+    review_col = st.selectbox(
+        "Pilih Kolom Review",
+        df.columns
+    )
+
+    st.dataframe(df.head())
+
+else:
+
+    st.info(
+        "Silakan upload dataset terlebih dahulu"
+    )
+
+    st.stop()
 # =====================================================
 # Pilih Kolom Review
 # ===================================================== 
