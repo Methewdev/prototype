@@ -1,0 +1,11 @@
+streamlit
+pandas
+numpy
+torch
+transformers
+plotly
+openpyxl
+sastrawi
+sentencepiece
+accelerate
+safetensors
