@@ -295,3 +295,218 @@ with tab1:
 if "processed_df" not in st.session_state:
 
     st.session_state.processed_df = df
+
+
+
+# =====================================================
+# LIBRARY
+# =====================================================
+
+import re
+
+from Sastrawi.Stemmer.StemmerFactory import (
+    StemmerFactory
+)
+
+from Sastrawi.StopWordRemover.StopWordRemoverFactory import (
+    StopWordRemoverFactory
+)
+
+
+# =====================================================
+# Dictionary Normalisasi
+# =====================================================
+
+normalization_dict = {
+
+    "gk": "tidak",
+    "ga": "tidak",
+    "yg": "yang",
+    "bgt": "banget",
+    "udh": "sudah",
+    "tp": "tapi",
+    "dr": "dari",
+    "dgn": "dengan",
+    "krn": "karena"
+
+}
+
+# =====================================================
+# Stopword & Stemmer
+# =====================================================
+
+stop_factory = (
+    StopWordRemoverFactory()
+)
+
+stop_words = set(
+    stop_factory.get_stop_words()
+)
+
+stemmer = (
+    StemmerFactory()
+    .create_stemmer()
+)
+
+
+# =====================================================
+# Cleaning Function
+# =====================================================
+
+def cleaning(text):
+
+    text = str(text)
+
+    text = re.sub(
+        r"http\\S+",
+        "",
+        text
+    )
+
+    text = re.sub(
+        r"www\\S+",
+        "",
+        text
+    )
+
+    text = re.sub(
+        r"[^a-zA-Z\\s]",
+        " ",
+        text
+    )
+
+    text = re.sub(
+        r"\\s+",
+        " ",
+        text
+    )
+
+    return text.strip()
+	
+# =====================================================
+# Case Folding
+# =====================================================
+
+def case_folding(text):
+
+    return text.lower()
+	
+	
+# =====================================================
+# Normalization
+# =====================================================
+
+def normalize(text):
+
+    words = text.split()
+
+    words = [
+
+        normalization_dict.get(
+            word,
+            word
+        )
+
+        for word in words
+
+    ]
+
+    return " ".join(words)
+	
+	
+# =====================================================
+# Tokenization
+# =====================================================
+
+def tokenize(text):
+
+    return text.split()
+	
+# =====================================================
+# Stopword Removal
+# =====================================================
+
+def remove_stopwords(tokens):
+
+    return [
+
+        word
+
+        for word in tokens
+
+        if word not in stop_words
+
+    ]
+
+# =====================================================
+# Stemming
+# =====================================================
+
+def stemming(tokens):
+
+    return [
+
+        stemmer.stem(word)
+
+        for word in tokens
+
+    ]
+	
+	
+# =====================================================
+# Buttonn Analis
+# =====================================================
+
+
+run_preprocessing = st.sidebar.button(
+    "🚀 Jalankan Analisis"
+)
+
+# =====================================================
+# Generate Pipeline
+# =====================================================
+
+if run_preprocessing:
+
+    process_df = df.copy()
+
+    process_df["cleaning"] = (
+        process_df[review_col]
+        .apply(cleaning)
+    )
+
+    process_df["casefold"] = (
+        process_df["cleaning"]
+        .apply(case_folding)
+    )
+
+    process_df["normalisasi"] = (
+        process_df["casefold"]
+        .apply(normalize)
+    )
+
+    process_df["token"] = (
+        process_df["normalisasi"]
+        .apply(tokenize)
+    )
+
+    process_df["stopword"] = (
+        process_df["token"]
+        .apply(remove_stopwords)
+    )
+
+    process_df["stemming"] = (
+        process_df["stopword"]
+        .apply(stemming)
+    )
+
+    process_df["final_text"] = (
+        process_df["stemming"]
+        .apply(
+            lambda x: " ".join(x)
+        )
+    )
+
+    st.session_state.processed_df = (
+        process_df
+    )
