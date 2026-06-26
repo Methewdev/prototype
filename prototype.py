@@ -224,11 +224,10 @@ with tab1:
 
     st.subheader("Preview Dataset")
 
-    st.dataframe(
-        df.head(10),
-        use_container_width=True
-    )
-
+  st.dataframe(
+    df.head(10),
+    width="stretch"
+)
     st.markdown("---")
 
     st.subheader("Informasi Kolom")
@@ -240,7 +239,7 @@ with tab1:
 
     st.dataframe(
         info_df,
-        use_container_width=True
+        width="stretch"
     )
 
     st.markdown("---")
@@ -254,7 +253,7 @@ with tab1:
 
     st.dataframe(
         missing_df,
-        use_container_width=True
+        width="stretch"
     )
 
     # Rating Distribution
@@ -285,7 +284,7 @@ with tab1:
 
         st.plotly_chart(
             fig,
-            use_container_width=True
+            width="stretch"
         )
 
 # =====================================================
