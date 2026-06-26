@@ -11,3 +11,9 @@ accelerate
 safetensors
 deep-translator
 scikit-learn
+streamlit
+pandas
+numpy
+plotly
+openpyxl
+sastrawi
