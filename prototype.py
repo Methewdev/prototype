@@ -31,10 +31,12 @@ from mdoules.indobert import (
 )
 
 from mdoules.dashboard import (
+    dashboard_metrics,
     sentiment_chart,
     emotion_chart,
     sentiment_vs_emotion,
-    top_words
+    top_words,
+    download_result
 )
 
 # =====================================================
