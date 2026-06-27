@@ -93,6 +93,10 @@ menggunakan Teacher Model dan IndoBERT.
 # =====================================================
 # SIDEBAR
 # =====================================================
+# =====================================================
+# SIDEBAR
+# =====================================================
+
 st.sidebar.subheader("🌐 Google Play Scraping")
 
 app_name = st.sidebar.selectbox(
@@ -102,10 +106,10 @@ app_name = st.sidebar.selectbox(
 
 total_review = st.sidebar.slider(
     "Jumlah Review",
-    100,
-    3000,
-    500,
-    100
+    min_value=100,
+    max_value=3000,
+    value=500,
+    step=100
 )
 
 if st.sidebar.button("🌐 Scraping Review"):
@@ -119,40 +123,24 @@ if st.sidebar.button("🌐 Scraping Review"):
 
     st.session_state.df = df
 
-# =====================================================
-# PILIH SUMBER DATA
-# =====================================================
-
-if source == "🌐 Google Play Scraping":
-
-    app_name = st.sidebar.selectbox(
-        "📱 Pilih Mobile Banking",
-        list(APP_MAPPING.keys())
+    st.sidebar.success(
+        f"✅ {len(df)} review berhasil diambil."
     )
+# =====================================================
+# LOAD DATASET
+# =====================================================
 
-    total_review = st.sidebar.slider(
-        "Jumlah Review",
-        100,
-        3000,
-        500,
-        100
-    )
+if "df" not in st.session_state:
 
-    if st.sidebar.button("🌐 Scraping Review"):
+    st.info("Silakan lakukan scraping terlebih dahulu.")
 
-        with st.spinner("Mengambil review..."):
+    st.stop()
 
-            df = scrape_google_play(
-                app_name,
-                total_review
-            )
+df = st.session_state.df
 
-        st.session_state.df = df
+review_col = "content"
 
-        st.sidebar.success(
-            f"{len(df)} review berhasil diambil."
-        )
-
+show_dataset_info(df)
 # =====================================================
 # REVIEW COLUMN
 # =====================================================
