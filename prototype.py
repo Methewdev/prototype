@@ -142,14 +142,9 @@ show_dataset_info(df)
 # REVIEW COLUMN
 # =====================================================
 
-if source == "🌐 Google Play Scraping":
+review_col = "content"
 
-    review_col = "content"
-
-else:
-
-    review_col = detect_review_column(df)
-    show_dataset_info(df)
+show_dataset_info(df)
 # =====================================================
 # SESSION STATE
 # =====================================================
