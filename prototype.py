@@ -969,46 +969,69 @@ with tab7:
 
     if st.session_state.processed_df is None:
 
-        st.warning("Silakan klik Jalankan Analisis.")
+        st.warning("Silakan klik **Jalankan Analisis** terlebih dahulu.")
 
     else:
 
         process_df = st.session_state.processed_df
 
-        st.dataframe(
+        # ==========================================
+        # Membuat DataFrame Preview
+        # ==========================================
 
-            process_df[
-                [
-                    "stopword",
-                    "stemming"
-                ]
-            ],
-            
+        preview = process_df[
+            [
+                "stopword",
+                "stemming"
+            ]
+        ].copy()
+
+        preview.columns = [
+            "Sebelum Stemming",
+            "Sesudah Stemming"
+        ]
+
+        # Tambahkan nomor urut
+        preview.insert(
+            0,
+            "No",
+            range(1, len(preview) + 1)
+        )
+
+        st.subheader("📋 Hasil Stemming")
+
+        st.dataframe(
+            preview,
             width="stretch",
             hide_index=True
-
         )
+
+        st.markdown("---")
+
+        # ==========================================
+        # Detail Perubahan
+        # ==========================================
+
+        st.subheader("📄 Detail Perubahan")
 
         idx = st.number_input(
-
-            "Index",
-
-            0,
-
-            len(process_df)-1,
-
-            0,
-
+            "Pilih Index",
+            min_value=0,
+            max_value=len(process_df) - 1,
+            value=0,
             key="stem"
-
         )
+
+        st.write("### Sebelum Stemming")
 
         st.info(
-            process_df.loc[idx,"stopword"]
+            process_df.loc[idx, "stopword"]
         )
 
+        st.write("### Sesudah Stemming")
+
         st.success(
-            process_df.loc[idx,"stemming"]
+            process_df.loc[idx, "stemming"]
         )
 # =====================================================
 # TAB 8 Teacher Sentiment
