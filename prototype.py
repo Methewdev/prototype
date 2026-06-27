@@ -93,7 +93,31 @@ menggunakan Teacher Model dan IndoBERT.
 # =====================================================
 # SIDEBAR
 # =====================================================
+st.sidebar.subheader("🌐 Google Play Scraping")
 
+app_name = st.sidebar.selectbox(
+    "📱 Pilih Mobile Banking",
+    list(APP_MAPPING.keys())
+)
+
+total_review = st.sidebar.slider(
+    "Jumlah Review",
+    100,
+    3000,
+    500,
+    100
+)
+
+if st.sidebar.button("🌐 Scraping Review"):
+
+    with st.spinner("Mengambil data dari Google Play..."):
+
+        df = scrape_google_play(
+            app_name,
+            total_review
+        )
+
+    st.session_state.df = df
 
 # =====================================================
 # PILIH SUMBER DATA
