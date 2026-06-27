@@ -102,7 +102,6 @@ source = st.sidebar.radio(
 
     [
         "🌐 Google Play Scraping",
-        "📁 Upload Dataset"
     ]
 )
 
@@ -140,21 +139,7 @@ if source == "🌐 Google Play Scraping":
         st.sidebar.success(
             f"{len(df)} review berhasil diambil."
         )
-# =====================================================
-# LOAD DATASET
-# =====================================================
 
-if "df" not in st.session_state:
-
-    st.info(
-
-        "Silakan lakukan Scraping atau Upload Dataset."
-
-    )
-
-    st.stop()
-
-df = st.session_state.df
 # =====================================================
 # REVIEW COLUMN
 # =====================================================
@@ -174,7 +159,7 @@ else:
 if "df" not in st.session_state:
 
     st.info(
-        "Silakan pilih sumber data kemudian lakukan Scraping atau Upload Dataset."
+        "Silakan pilih sumber data kemudian lakukan Scraping."
     )
 
     st.stop()
