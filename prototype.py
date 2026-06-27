@@ -1099,74 +1099,40 @@ with tab12:
 
     if st.session_state.processed_df is None:
 
-        st.warning("Silakan klik Jalankan Analisis.")
+        st.warning(
+            "Silakan klik Jalankan Analisis."
+        )
 
     else:
 
         process_df = st.session_state.processed_df
 
-        st.subheader("Ringkasan Dataset")
-
-        c1,c2,c3,c4 = st.columns(4)
-
-        c1.metric(
-            "Jumlah Review",
-            len(process_df)
-        )
-
-        c2.metric(
-            "Sentiment",
-            process_df["teacher_sentiment"].mode()[0]
-        )
-
-        c3.metric(
-            "Emotion",
-            process_df["teacher_emotion"].mode()[0]
-        )
-
-        c4.metric(
-            "Panjang Rata-rata",
-            round(
-                process_df["final_text"]
-                .str.len()
-                .mean()
-            )
-        )
+        dashboard_metrics(process_df)
 
         st.markdown("---")
 
-        st.subheader("Distribusi Sentiment")
+        col1, col2 = st.columns(2)
 
-        sentiment_chart(process_df)
+        with col1:
+
+            sentiment_chart(process_df)
+
+        with col2:
+
+            emotion_chart(process_df)
 
         st.markdown("---")
 
-        st.subheader("Distribusi Emotion")
-
-        emotion_chart(process_df)
-
-        st.markdown("---")
-
-        st.subheader("Cross Tab Sentiment vs Emotion")
+        st.subheader("📊 Sentiment vs Emotion")
 
         sentiment_vs_emotion(process_df)
 
         st.markdown("---")
 
-        st.subheader("Top 20 Words")
+        st.subheader("🔤 Top 20 Words")
 
         top_words(process_df)
 
         st.markdown("---")
 
-        st.download_button(
-
-            "📥 Download Hasil Analisis",
-
-            process_df.to_csv(index=False),
-
-            "hasil_analisis.csv",
-
-            "text/csv"
-
-        )
+        download_result(process_df)
