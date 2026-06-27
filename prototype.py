@@ -534,9 +534,7 @@ if run_preprocessing:
 # =====================================================
 # Struktur Tabs
 # =====================================================
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
-
-    "📊 Data Understanding",
+tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
 
     "🧹 Cleaning",
 
