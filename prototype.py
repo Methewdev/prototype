@@ -516,7 +516,12 @@ with tab2:
             "Review Asli",
             "Hasil Cleaning"
         ]
-
+        # Tambahkan nomor urut
+        preview.insert(
+        0,
+        "No",
+        range(1, len(preview) + 1)
+        )
         st.dataframe(
             preview,
             width="stretch",
