@@ -531,3 +531,167 @@ if run_preprocessing:
     st.session_state.processed_df = (
         process_df
     )
+# =====================================================
+# Struktur Tabs
+# =====================================================
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+
+    "📊 Data Understanding",
+
+    "🧹 Cleaning",
+
+    "🔤 Case Folding",
+
+    "📝 Normalization",
+
+    "🔪 Tokenization",
+
+    "🚫 Stopword Removal",
+
+    "🌱 Stemming"
+
+])
+
+# =====================================================
+# Tab Cleaning
+# =====================================================
+
+with tab2:
+
+    st.subheader(
+        "Text Cleaning"
+    )
+
+    if "cleaning" in st.session_state.processed_df.columns:
+
+        st.dataframe(
+
+            st.session_state.processed_df[
+                [
+                    review_col,
+                    "cleaning"
+                ]
+            ].head(20),
+
+            use_container_width=True
+
+        )
+
+# =====================================================
+# Case Folding
+# =====================================================
+
+with tab3:
+
+    st.subheader(
+        "Case Folding"
+    )
+
+    if "casefold" in st.session_state.processed_df.columns:
+
+        st.dataframe(
+
+            st.session_state.processed_df[
+                [
+                    "cleaning",
+                    "casefold"
+                ]
+            ].head(20),
+
+            use_container_width=True
+
+        )
+		
+# =====================================================
+# Normalization
+# =====================================================
+with tab4:
+
+    st.subheader(
+        "Normalization"
+    )
+
+    if "normalisasi" in st.session_state.processed_df.columns:
+
+        st.dataframe(
+
+            st.session_state.processed_df[
+                [
+                    "casefold",
+                    "normalisasi"
+                ]
+            ].head(20),
+
+            use_container_width=True
+
+        )
+# =====================================================
+# Tokenization
+# =====================================================
+with tab5:
+
+    st.subheader(
+        "Tokenization"
+    )
+
+    if "token" in st.session_state.processed_df.columns:
+
+        st.dataframe(
+
+            st.session_state.processed_df[
+                [
+                    "normalisasi",
+                    "token"
+                ]
+            ].head(20),
+
+            use_container_width=True
+
+        )
+# =====================================================
+# Stopword Removal
+# =====================================================
+with tab6:
+
+    st.subheader(
+        "Stopword Removal"
+    )
+
+    if "stopword" in st.session_state.processed_df.columns:
+
+        st.dataframe(
+
+            st.session_state.processed_df[
+                [
+                    "token",
+                    "stopword"
+                ]
+            ].head(20),
+
+            use_container_width=True
+
+        )
+# =====================================================
+# Stemming
+# =====================================================
+with tab7:
+
+    st.subheader(
+        "Stemming"
+    )
+
+    if "final_text" in st.session_state.processed_df.columns:
+
+        st.dataframe(
+
+            st.session_state.processed_df[
+                [
+                    "stopword",
+                    "stemming",
+                    "final_text"
+                ]
+            ].head(20),
+
+            use_container_width=True
+
+        )
