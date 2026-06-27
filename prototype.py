@@ -664,7 +664,12 @@ with tab3:
             "Sesudah"
 
         ]
-
+        # Tambahkan nomor urut
+        preview.insert(
+        0,
+        "No",
+        range(1, len(preview) + 1)
+        )
         st.dataframe(
 
             preview,
@@ -790,7 +795,12 @@ with tab4:
             "Sebelum",
             "Sesudah"
         ]
-
+        # Tambahkan nomor urut
+        preview.insert(
+             0,
+            "No",
+            range(1, len(preview) + 1)
+        )
         st.dataframe(
             preview,
             width="stretch",
@@ -848,7 +858,12 @@ with tab5:
                 "token"
             ]
         ]
-
+        # Tambahkan nomor urut
+        preview.insert(
+            0,
+            "No",
+            range(1, len(preview) + 1)
+        )
         st.dataframe(
             preview,
             width="stretch",
@@ -893,6 +908,12 @@ with tab6:
                     "token",
                     "stopword"
                 ]
+                # Tambahkan nomor urut
+            preview.insert(
+                0,
+                "No",
+                range(1, len(preview) + 1)
+            )
             ],
 
             width="stretch",
