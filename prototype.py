@@ -93,9 +93,6 @@ menggunakan Teacher Model dan IndoBERT.
 # =====================================================
 # SIDEBAR
 # =====================================================
-# =====================================================
-# SIDEBAR
-# =====================================================
 
 st.sidebar.subheader("🌐 Google Play Scraping")
 
@@ -153,34 +150,6 @@ else:
 
     review_col = detect_review_column(df)
     show_dataset_info(df)
-# =====================================================
-# LOAD DATASET DARI SESSION
-# =====================================================
-
-if "df" not in st.session_state:
-
-    st.info(
-        "Silakan pilih sumber data kemudian lakukan Scraping."
-    )
-
-    st.stop()
-
-df = st.session_state.df
-
-# =====================================================
-# REVIEW COLUMN
-# =====================================================
-
-if source == "🌐 Google Play Scraping":
-
-    review_col = "content"
-
-else:
-
-    review_col = detect_review_column(df)
-
-show_dataset_info(df)
-
 # =====================================================
 # SESSION STATE
 # =====================================================
