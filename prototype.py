@@ -222,7 +222,7 @@ with tab1:
 
     st.markdown("---")
 
-    st.subheader("Preview Dataset")
+st.subheader("Preview Dataset")
 
   st.dataframe(
     df.head(10),
