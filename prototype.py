@@ -320,22 +320,15 @@ with tab1:
     # PREVIEW DATASET
     # =====================================================
 
-   st.subheader("📄 Preview Dataset")
+    st.subheader("📄 Preview Dataset")
 
-    # Membuat salinan dataframe
-    preview_df = df.copy()
-
-    # Menambahkan kolom nomor
-    preview_df.insert(0, "No", range(1, len(preview_df) + 1))
+        preview_df = df.copy()
+        preview_df.index = range(1, len(preview_df) + 1)
 
     st.dataframe(
-    preview_df,
-    width="stretch",
-    hide_index=True
+        preview_df,
+        width="stretch"
     )
-
-    st.markdown("---")
-
     # =====================================================
     # MISSING VALUE
     # =====================================================
