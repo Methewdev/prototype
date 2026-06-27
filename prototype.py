@@ -283,6 +283,26 @@ with tab1:
     )
 
     st.markdown("---")
+# =====================================================
+    # INFORMASI KOLOM
+    # =====================================================
+
+    st.subheader("📋 Informasi Dataset")
+
+    info_df = pd.DataFrame({
+
+        "Kolom": df.columns,
+
+        "Tipe Data": df.dtypes.astype(str)
+
+    })
+
+    st.dataframe(
+        info_df,
+        width="stretch"
+    )
+
+    st.markdown("---")
 
     # =====================================================
     # DISTRIBUSI RATING
