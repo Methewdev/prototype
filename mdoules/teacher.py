@@ -7,11 +7,8 @@ TEACHER MODEL
 =====================================================
 """
 
-import pandas as pd
 import streamlit as st
-
 from transformers import pipeline
-
 from deep_translator import GoogleTranslator
 
 # =====================================================
@@ -21,56 +18,73 @@ from deep_translator import GoogleTranslator
 @st.cache_resource
 def load_teacher_models():
 
-    sentiment = pipeline(
+    sentiment_model = pipeline(
         "text-classification",
         model="mdhugol/indonesia-bert-sentiment-classification"
     )
 
-    emotion = pipeline(
+    emotion_model = pipeline(
         "text-classification",
         model="SamLowe/roberta-base-go_emotions"
     )
 
-    return sentiment, emotion
+    return sentiment_model, emotion_model
+
 
 # =====================================================
-# MAPPING SENTIMENT
+# SENTIMENT MAP
 # =====================================================
 
 SENTIMENT_MAP = {
-
     "LABEL_0": "Positive",
-
     "LABEL_1": "Neutral",
-
     "LABEL_2": "Negative"
-
 }
 
+
 # =====================================================
-# MAPPING EMOTION
+# EMOTION MAP
 # =====================================================
 
 EMOTION_MAP = {
 
+    # Senang
     "joy": "Senang",
-    "gratitude": "Senang",
-    "approval": "Senang",
     "admiration": "Senang",
+    "approval": "Senang",
+    "gratitude": "Senang",
+    "love": "Senang",
+    "optimism": "Senang",
+    "relief": "Senang",
+    "pride": "Senang",
+    "amusement": "Senang",
+    "caring": "Senang",
+    "desire": "Senang",
+    "excitement": "Senang",
 
+    # Marah
     "anger": "Marah",
     "annoyance": "Marah",
     "disapproval": "Marah",
+    "disgust": "Marah",
 
-    "sadness": "Sedih",
-    "grief": "Sedih",
-    "disappointment": "Sedih",
-
+    # Frustasi
     "fear": "Frustasi",
-    "frustration": "Frustasi",
-    "confusion": "Frustasi"
+    "confusion": "Frustasi",
+    "disappointment": "Frustasi",
+    "sadness": "Frustasi",
+    "grief": "Frustasi",
+    "embarrassment": "Frustasi",
+    "nervousness": "Frustasi",
+    "remorse": "Frustasi",
 
+    # Netral
+    "neutral": "Netral",
+    "realization": "Netral",
+    "curiosity": "Netral",
+    "surprise": "Netral"
 }
+
 
 # =====================================================
 # TRANSLATE
@@ -85,12 +99,51 @@ def translate(text):
             target="en"
         ).translate(text)
 
-    except:
+    except Exception:
 
         return text
 
+
 # =====================================================
-# PIPELINE
+# PREDICT SENTIMENT
+# =====================================================
+
+def predict_sentiment(text, sentiment_model):
+
+    result = sentiment_model(text)[0]
+
+    sentiment = SENTIMENT_MAP.get(
+        result["label"],
+        "Neutral"
+    )
+
+    score = round(result["score"], 4)
+
+    return sentiment, score
+
+
+# =====================================================
+# PREDICT EMOTION
+# =====================================================
+
+def predict_emotion(text, emotion_model):
+
+    english = translate(text)
+
+    result = emotion_model(english)[0]
+
+    emotion = EMOTION_MAP.get(
+        result["label"],
+        "Netral"
+    )
+
+    score = round(result["score"], 4)
+
+    return emotion, score
+
+
+# =====================================================
+# TEACHER PIPELINE
 # =====================================================
 
 def teacher_pipeline(df):
@@ -109,68 +162,36 @@ def teacher_pipeline(df):
 
     for i, text in enumerate(df["final_text"]):
 
-        # ==========================
+        # -----------------------------
         # Sentiment
-        # ==========================
-
-        s = sentiment_model(text)[0]
-
-        sentiments.append(
-
-            SENTIMENT_MAP.get(
-                s["label"],
-                s["label"]
-            )
-
+        # -----------------------------
+        sentiment, sentiment_score = predict_sentiment(
+            text,
+            sentiment_model
         )
 
-        sentiment_scores.append(
+        sentiments.append(sentiment)
+        sentiment_scores.append(sentiment_score)
 
-            round(
-                s["score"],
-                4
-            )
-
-        )
-
-        # ==========================
+        # -----------------------------
         # Emotion
-        # ==========================
-
-        en_text = translate(text)
-
-        e = emotion_model(en_text)[0]
-
-        emotions.append(
-
-            EMOTION_MAP.get(
-                e["label"],
-                e["label"]
-            )
-
+        # -----------------------------
+        emotion, emotion_score = predict_emotion(
+            text,
+            emotion_model
         )
 
-        emotion_scores.append(
+        emotions.append(emotion)
+        emotion_scores.append(emotion_score)
 
-            round(
-                e["score"],
-                4
-            )
+        progress.progress((i + 1) / total)
 
-        )
-
-        progress.progress(
-            (i + 1) / total
-        )
+    progress.empty()
 
     df["teacher_sentiment"] = sentiments
-
     df["sentiment_score"] = sentiment_scores
 
     df["teacher_emotion"] = emotions
-
     df["emotion_score"] = emotion_scores
-
-    progress.empty()
 
     return df
