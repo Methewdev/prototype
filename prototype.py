@@ -224,7 +224,7 @@ with tab1:
 
 st.subheader("Preview Dataset")
 
-    st.dataframe(
+st.dataframe(
     df.head(10),
     width="stretch"
 )
