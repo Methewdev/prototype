@@ -136,8 +136,6 @@ if "df" not in st.session_state:
 df = st.session_state.df
 
 review_col = "content"
-
-show_dataset_info(df)
 # =====================================================
 # REVIEW COLUMN
 # =====================================================
