@@ -106,33 +106,7 @@ source = st.sidebar.radio(
     ]
 )
 
-# =====================================================
-# LOAD DATASET
-# =====================================================
 
-if "df" not in st.session_state:
-
-    st.info(
-
-        "Silakan lakukan Scraping atau Upload Dataset."
-
-    )
-
-    st.stop()
-
-df = st.session_state.df
-# =====================================================
-# REVIEW COLUMN
-# =====================================================
-
-if source == "🌐 Google Play Scraping":
-
-    review_col = "content"
-
-else:
-
-    review_col = detect_review_column(df)
-    show_dataset_info(df)
 # =====================================================
 # PILIH SUMBER DATA
 # =====================================================
@@ -166,7 +140,60 @@ if source == "🌐 Google Play Scraping":
         st.sidebar.success(
             f"{len(df)} review berhasil diambil."
         )
+# =====================================================
+# LOAD DATASET
+# =====================================================
 
+if "df" not in st.session_state:
+
+    st.info(
+
+        "Silakan lakukan Scraping atau Upload Dataset."
+
+    )
+
+    st.stop()
+
+df = st.session_state.df
+# =====================================================
+# REVIEW COLUMN
+# =====================================================
+
+if source == "🌐 Google Play Scraping":
+
+    review_col = "content"
+
+else:
+
+    review_col = detect_review_column(df)
+    show_dataset_info(df)
+# =====================================================
+# LOAD DATASET DARI SESSION
+# =====================================================
+
+if "df" not in st.session_state:
+
+    st.info(
+        "Silakan pilih sumber data kemudian lakukan Scraping atau Upload Dataset."
+    )
+
+    st.stop()
+
+df = st.session_state.df
+
+# =====================================================
+# REVIEW COLUMN
+# =====================================================
+
+if source == "🌐 Google Play Scraping":
+
+    review_col = "content"
+
+else:
+
+    review_col = detect_review_column(df)
+
+show_dataset_info(df)
 # ===========================
 # UPLOAD DATASET
 # ===========================
