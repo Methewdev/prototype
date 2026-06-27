@@ -45,7 +45,7 @@ from mdoules.dashboard import (
 
 st.set_page_config(
 
-    page_title="Analysis Dashboard Sentiment and Emotion",
+    page_title="AI Dashboard",
 
     page_icon="📊",
 
@@ -87,7 +87,7 @@ h1,h2,h3{
 # HEADER
 # =====================================================
 
-st.title("📊 Livin NLP Analysis Dashboard")
+st.title("📊 Analysis Dashboard Sentiment and Emotion")
 
 st.markdown("""
 Prototype Analisis Sentiment dan Emotion Review Livin' by Mandiri
