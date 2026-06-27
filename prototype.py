@@ -189,7 +189,7 @@ tab1 = st.tabs([
 
 with tab1:
 
-    st.subheader("📊 Data Understanding")
+st.subheader("📊 Data Understanding")
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -223,35 +223,30 @@ with tab1:
     st.markdown("---")
 
 st.subheader("Preview Dataset")
-
 st.dataframe(
     df.head(10),
     width="stretch"
 )
-    st.markdown("---")
+st.markdown("---")
 
-    st.subheader("Informasi Kolom")
+st.subheader("Informasi Kolom")
 
     info_df = pd.DataFrame({
         "Column": df.columns,
         "Type": df.dtypes.astype(str)
     })
-
-    st.dataframe(
+st.dataframe(
         info_df,
         width="stretch"
     )
-
-    st.markdown("---")
-
-    st.subheader("Missing Value")
+st.markdown("---")
+st.subheader("Missing Value")
 
     missing_df = pd.DataFrame({
         "Column": df.columns,
         "Missing": df.isnull().sum()
     })
-
-    st.dataframe(
+st.dataframe(
         missing_df,
         width="stretch"
     )
@@ -294,8 +289,6 @@ st.dataframe(
 if "processed_df" not in st.session_state:
 
     st.session_state.processed_df = df
-
-
 
 # =====================================================
 # LIBRARY
