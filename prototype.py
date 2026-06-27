@@ -230,7 +230,19 @@ with tab1:
 
     st.markdown("---")
 
-   
+    # ==========================
+    # Preview Dataset
+    # ==========================
+
+    st.subheader("📄 Preview Dataset")
+
+    st.dataframe(
+        df.head(10),
+        width="stretch"
+    )
+
+    st.markdown("---")
+
     # ==========================
     # Informasi Kolom
     # ==========================
@@ -539,18 +551,6 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
     "🌱 Stemming"
 
 ])
- # ==========================
- # Preview Dataset
- # ==========================
-
-    st.subheader("📄 Preview Dataset")
-
-    st.dataframe(
-        df.head(10),
-        width="stretch"
-    )
-
-    st.markdown("---")
 
 # =====================================================
 # Tab Cleaning
