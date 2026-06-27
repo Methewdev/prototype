@@ -5,30 +5,30 @@
 import streamlit as st
 
 # =====================================================
-# Import Modules
+# Import mdoules
 # =====================================================
 
-from modules.loader import (
+from mdoules.loader import (
     upload_dataset,
     load_dataset,
     detect_review_column,
     show_dataset_info
 )
 
-from modules.preprocessing import (
+from mdoules.preprocessing import (
     preprocessing_pipeline
 )
 
-from modules.teacher import (
+from mdoules.teacher import (
     teacher_pipeline
 )
 
-from modules.indobert import (
+from mdoules.indobert import (
     tokenizer_process,
     embedding_process
 )
 
-from modules.dashboard import (
+from mdoules.dashboard import (
     sentiment_chart,
     emotion_chart,
     sentiment_vs_emotion,
