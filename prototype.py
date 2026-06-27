@@ -285,7 +285,7 @@ with tab1:
     )
 
     st.markdown("---")
-# =====================================================
+    # =====================================================
     # INFORMASI KOLOM
     # =====================================================
 
@@ -363,7 +363,7 @@ with tab1:
         st.info(
             "Kolom 'score' tidak ditemukan."
         )
-		# =====================================================
+# =====================================================
 # TAB 2 : CLEANING
 # =====================================================
 
@@ -503,7 +503,7 @@ with tab2:
             width="stretch"
 
         )
-		# =====================================================
+# =====================================================
 # TAB 3 : CASE FOLDING
 # =====================================================
 
@@ -661,6 +661,375 @@ with tab3:
                 [
                     "cleaning",
                     "casefold"
+                ]
+            ],
+
+            width="stretch"
+
+        )
+# =====================================================
+# TAB 4 : NORMALIZATION
+# =====================================================
+
+with tab4:
+
+    st.header("📝 Normalization")
+
+    st.write("""
+    Tahap Normalization mengubah kata tidak baku menjadi kata baku.
+    Contoh:
+
+    - gk → tidak
+    - yg → yang
+    - bgt → banget
+    - tp → tapi
+    """)
+
+    if st.session_state.processed_df is None:
+
+        st.warning("Silakan klik Jalankan Analisis terlebih dahulu.")
+
+    else:
+
+        process_df = st.session_state.processed_df
+
+        st.subheader("📊 Statistik")
+
+        col1, col2 = st.columns(2)
+
+        col1.metric(
+            "Jumlah Review",
+            len(process_df)
+        )
+
+        col2.metric(
+            "Kolom",
+            "normalisasi"
+        )
+
+        st.markdown("---")
+
+        preview = process_df[
+            [
+                "casefold",
+                "normalisasi"
+            ]
+        ].copy()
+
+        preview.columns = [
+            "Sebelum",
+            "Sesudah"
+        ]
+
+        st.dataframe(
+            preview.head(20),
+            width="stretch"
+        )
+
+        st.markdown("---")
+
+        idx = st.number_input(
+            "Pilih Index",
+            0,
+            len(process_df)-1,
+            0,
+            key="norm"
+        )
+
+        st.info(
+            process_df.loc[idx,"casefold"]
+        )
+
+        st.success(
+            process_df.loc[idx,"normalisasi"]
+        )
+
+        st.markdown("---")
+
+        st.dataframe(
+            process_df[
+                [
+                    "casefold",
+                    "normalisasi"
+                ]
+            ],
+            width="stretch"
+        )
+# =====================================================
+# TAB 4 : NORMALIZATION
+# =====================================================
+
+with tab4:
+
+    st.header("📝 Normalization")
+
+    st.write("""
+    Tahap Normalization mengubah kata tidak baku menjadi kata baku.
+    Contoh:
+
+    - gk → tidak
+    - yg → yang
+    - bgt → banget
+    - tp → tapi
+    """)
+
+    if st.session_state.processed_df is None:
+
+        st.warning("Silakan klik Jalankan Analisis terlebih dahulu.")
+
+    else:
+
+        process_df = st.session_state.processed_df
+
+        st.subheader("📊 Statistik")
+
+        col1, col2 = st.columns(2)
+
+        col1.metric(
+            "Jumlah Review",
+            len(process_df)
+        )
+
+        col2.metric(
+            "Kolom",
+            "normalisasi"
+        )
+
+        st.markdown("---")
+
+        preview = process_df[
+            [
+                "casefold",
+                "normalisasi"
+            ]
+        ].copy()
+
+        preview.columns = [
+            "Sebelum",
+            "Sesudah"
+        ]
+
+        st.dataframe(
+            preview.head(20),
+            width="stretch"
+        )
+
+        st.markdown("---")
+
+        idx = st.number_input(
+            "Pilih Index",
+            0,
+            len(process_df)-1,
+            0,
+            key="norm"
+        )
+
+        st.info(
+            process_df.loc[idx,"casefold"]
+        )
+
+        st.success(
+            process_df.loc[idx,"normalisasi"]
+        )
+
+        st.markdown("---")
+
+        st.dataframe(
+            process_df[
+                [
+                    "casefold",
+                    "normalisasi"
+                ]
+            ],
+            width="stretch"
+        )
+# =====================================================
+# TAB 5 : TOKENIZATION
+# =====================================================
+
+with tab5:
+
+    st.header("🔪 Tokenization")
+
+    if st.session_state.processed_df is None:
+
+        st.warning("Silakan klik Jalankan Analisis.")
+
+    else:
+
+        process_df = st.session_state.processed_df
+
+        preview = process_df[
+            [
+                "normalisasi",
+                "token"
+            ]
+        ]
+
+        st.dataframe(
+            preview.head(20),
+            width="stretch"
+        )
+
+        idx = st.number_input(
+            "Index",
+            0,
+            len(process_df)-1,
+            0,
+            key="token"
+        )
+
+        st.info(
+            process_df.loc[idx,"normalisasi"]
+        )
+
+        st.success(
+            process_df.loc[idx,"token"]
+        )
+# =====================================================
+# TAB 6 : STOPWORD
+# =====================================================
+
+with tab6:
+
+    st.header("🚫 Stopword Removal")
+
+    if st.session_state.processed_df is None:
+
+        st.warning("Silakan klik Jalankan Analisis.")
+
+    else:
+
+        process_df = st.session_state.processed_df
+
+        st.dataframe(
+
+            process_df[
+                [
+                    "token",
+                    "stopword"
+                ]
+            ].head(20),
+
+            width="stretch"
+
+        )
+
+        idx = st.number_input(
+
+            "Index",
+
+            0,
+
+            len(process_df)-1,
+
+            0,
+
+            key="stop"
+
+        )
+
+        st.info(
+            process_df.loc[idx,"token"]
+        )
+
+        st.success(
+            process_df.loc[idx,"stopword"]
+        )
+# =====================================================
+# TAB 7 : STEMMING
+# =====================================================
+
+with tab7:
+
+    st.header("🌱 Stemming")
+
+    if st.session_state.processed_df is None:
+
+        st.warning("Silakan klik Jalankan Analisis.")
+
+    else:
+
+        process_df = st.session_state.processed_df
+
+        st.dataframe(
+
+            process_df[
+                [
+                    "stopword",
+                    "stemming"
+                ]
+            ].head(20),
+
+            width="stretch"
+
+        )
+
+        idx = st.number_input(
+
+            "Index",
+
+            0,
+
+            len(process_df)-1,
+
+            0,
+
+            key="stem"
+
+        )
+
+        st.info(
+            process_df.loc[idx,"stopword"]
+        )
+
+        st.success(
+            process_df.loc[idx,"stemming"]
+        )
+		with tab8:
+
+    st.header("😊 Teacher Sentiment")
+
+    if st.session_state.processed_df is None:
+
+        st.warning("Silakan klik Jalankan Analisis.")
+
+    else:
+
+        process_df = st.session_state.processed_df
+
+        st.dataframe(
+
+            process_df[
+                [
+                    "final_text",
+                    "teacher_sentiment",
+                    "sentiment_score"
+                ]
+            ],
+
+            width="stretch"
+
+        )
+		with tab9:
+
+    st.header("😡 Teacher Emotion")
+
+    if st.session_state.processed_df is None:
+
+        st.warning("Silakan klik Jalankan Analisis.")
+
+    else:
+
+        process_df = st.session_state.processed_df
+
+        st.dataframe(
+
+            process_df[
+                [
+                    "final_text",
+                    "teacher_emotion",
+                    "emotion_score"
                 ]
             ],
 
