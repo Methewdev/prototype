@@ -194,23 +194,7 @@ else:
     review_col = detect_review_column(df)
 
 show_dataset_info(df)
-# ===========================
-# UPLOAD DATASET
-# ===========================
 
-else:
-
-    uploaded_file = upload_dataset()
-
-    if uploaded_file is not None:
-
-        df = load_dataset(uploaded_file)
-
-        st.session_state.df = df
-
-        st.sidebar.success(
-            f"Dataset berhasil dimuat ({len(df)} review)"
-        )
 # =====================================================
 # SESSION STATE
 # =====================================================
