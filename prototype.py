@@ -45,7 +45,7 @@ from mdoules.dashboard import (
 
 st.set_page_config(
 
-    page_title="Livin NLP Analysis Dashboard",
+    page_title="Analysis Dashboard Sentiment and Emotion",
 
     page_icon="📊",
 
