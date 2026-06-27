@@ -320,15 +320,15 @@ with tab1:
     # PREVIEW DATASET
     # =====================================================
 
-    st.subheader("📄 Preview Dataset")
+        st.subheader("📄 Preview Dataset")
 
         preview_df = df.copy()
         preview_df.index = range(1, len(preview_df) + 1)
 
-    st.dataframe(
+        st.dataframe(
         preview_df,
         width="stretch"
-    )
+        )
     # =====================================================
     # MISSING VALUE
     # =====================================================
