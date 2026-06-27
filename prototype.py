@@ -756,94 +756,6 @@ with tab4:
             width="stretch"
         )
 # =====================================================
-# TAB 4 : NORMALIZATION
-# =====================================================
-
-with tab4:
-
-    st.header("📝 Normalization")
-
-    st.write("""
-    Tahap Normalization mengubah kata tidak baku menjadi kata baku.
-    Contoh:
-
-    - gk → tidak
-    - yg → yang
-    - bgt → banget
-    - tp → tapi
-    """)
-
-    if st.session_state.processed_df is None:
-
-        st.warning("Silakan klik Jalankan Analisis terlebih dahulu.")
-
-    else:
-
-        process_df = st.session_state.processed_df
-
-        st.subheader("📊 Statistik")
-
-        col1, col2 = st.columns(2)
-
-        col1.metric(
-            "Jumlah Review",
-            len(process_df)
-        )
-
-        col2.metric(
-            "Kolom",
-            "normalisasi"
-        )
-
-        st.markdown("---")
-
-        preview = process_df[
-            [
-                "casefold",
-                "normalisasi"
-            ]
-        ].copy()
-
-        preview.columns = [
-            "Sebelum",
-            "Sesudah"
-        ]
-
-        st.dataframe(
-            preview.head(20),
-            width="stretch"
-        )
-
-        st.markdown("---")
-
-        idx = st.number_input(
-            "Pilih Index",
-            0,
-            len(process_df)-1,
-            0,
-            key="norm"
-        )
-
-        st.info(
-            process_df.loc[idx,"casefold"]
-        )
-
-        st.success(
-            process_df.loc[idx,"normalisasi"]
-        )
-
-        st.markdown("---")
-
-        st.dataframe(
-            process_df[
-                [
-                    "casefold",
-                    "normalisasi"
-                ]
-            ],
-            width="stretch"
-        )
-# =====================================================
 # TAB 5 : TOKENIZATION
 # =====================================================
 
@@ -986,7 +898,11 @@ with tab7:
         st.success(
             process_df.loc[idx,"stemming"]
         )
-		with tab8:
+# =====================================================
+# TAB 8 Teacher Sentiment
+# =====================================================
+
+with tab8:
 
     st.header("😊 Teacher Sentiment")
 
@@ -1011,7 +927,12 @@ with tab7:
             width="stretch"
 
         )
-		with tab9:
+
+# =====================================================
+# TAB 9 Teacher Emotion
+# =====================================================
+
+with tab9:
 
     st.header("😡 Teacher Emotion")
 
