@@ -2,19 +2,40 @@
 =====================================================
 GOOGLE PLAY SCRAPER
 =====================================================
-Mengambil Review Google Play Store
-=====================================================
 """
 
 import pandas as pd
 
-from google_play_scraper import reviews, Sort
+from google_play_scraper import reviews
+from google_play_scraper import Sort
+
+
+APP_MAPPING = {
+
+    "Livin' by Mandiri":
+        "com.bankmandiri.mandirionline",
+
+    "BRImo":
+        "id.co.bri.brimo",
+
+    "myBCA":
+        "com.bca.mybca.omni.android",
+
+    "SeaBank":
+        "com.seabank.seabank",
+
+    "Jenius":
+        "com.btpn.dc"
+
+}
 
 
 def scrape_google_play(
-    app_id,
-    count=500
+        app_name,
+        total_review
 ):
+
+    app_id = APP_MAPPING[app_name]
 
     result, _ = reviews(
 
@@ -26,26 +47,24 @@ def scrape_google_play(
 
         sort=Sort.NEWEST,
 
-        count=count
+        count=total_review
 
     )
 
     data = []
 
-    for review in result:
+    for r in result:
 
         data.append({
 
-            "userName": review["userName"],
+            "userName": r["userName"],
 
-            "score": review["score"],
+            "score": r["score"],
 
-            "content": review["content"],
+            "content": r["content"],
 
-            "tanggal": review["at"].strftime("%Y-%m-%d")
+            "tanggal": r["at"].strftime("%Y-%m-%d")
 
         })
 
-    df = pd.DataFrame(data)
-
-    return df
+    return pd.DataFrame(data)
