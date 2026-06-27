@@ -38,7 +38,7 @@ from mdoules.dashboard import (
     top_words,
     download_result
 )
-from modules.scraper import (
+from mdoules.scraper import (
     scrape_google_play,
     APP_MAPPING
 )
