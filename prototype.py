@@ -482,7 +482,41 @@ def stemming(tokens):
 run_preprocessing = st.sidebar.button(
     "🚀 Jalankan Analisis"
 )
+with st.spinner("Teacher Sentiment..."):
 
+    sentiment_result = process_df[
+        "final_text"
+    ].apply(
+        predict_sentiment
+    )
+
+process_df = pd.concat(
+
+    [
+        process_df,
+        sentiment_result
+    ],
+
+    axis=1
+)
+with st.spinner("Teacher Emotion..."):
+
+    emotion_result = process_df[
+        "final_text"
+    ].apply(
+        predict_emotion
+    )
+
+process_df = pd.concat(
+
+    [
+        process_df,
+        emotion_result
+    ],
+
+    axis=1
+)
+st.session_state.processed_df = process_df
 # =====================================================
 # Generate Pipeline
 # =====================================================
@@ -534,7 +568,7 @@ if run_preprocessing:
 # =====================================================
 # Struktur Tabs
 # =====================================================
-tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
 
     "🧹 Cleaning",
 
@@ -547,6 +581,10 @@ tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
     "🚫 Stopword Removal",
 
     "🌱 Stemming"
+	
+	"😊 Teacher Sentiment",
+
+    "😡 Teacher Emotion"
 
 ])
 
@@ -693,3 +731,206 @@ with tab7:
             use_container_width=True
 
         )
+		
+# =====================================================
+# Teacher Sentiment
+# =====================================================
+
+with tab8:
+
+    st.subheader("Teacher Sentiment")
+
+    st.dataframe(
+
+        st.session_state.processed_df[
+            [
+                "final_text",
+                "sentiment",
+                "sentiment_score"
+            ]
+        ],
+
+        width="stretch"
+    )
+	
+# =====================================================
+# Teacher Emotion
+# =====================================================
+with tab9:
+
+    st.subheader("Teacher Emotion")
+
+    st.dataframe(
+
+        st.session_state.processed_df[
+            [
+                "final_text",
+                "emotion",
+                "emotion_score"
+            ]
+        ],
+
+        width="stretch"
+    )
+
+# =====================================================
+# Library
+# =====================================================
+from transformers import pipeline
+
+from deep_translator import GoogleTranslator
+
+# =====================================================
+# LOAD TEACHER SENTIMENT
+# =====================================================
+
+@st.cache_resource
+def load_teacher_sentiment():
+
+    return pipeline(
+        "text-classification",
+        model="mdhugol/indonesia-bert-sentiment-classification"
+    )
+
+
+# =====================================================
+# LOAD TEACHER EMOTION
+# =====================================================
+
+@st.cache_resource
+def load_teacher_emotion():
+
+    return pipeline(
+        "text-classification",
+        model="SamLowe/roberta-base-go_emotions"
+    )
+	
+# =====================================================
+# LOAD MODEL
+# =====================================================
+
+teacher_sentiment = load_teacher_sentiment()
+
+teacher_emotion = load_teacher_emotion()
+
+
+# =====================================================
+# Sentiment Mapping
+# =====================================================
+sentiment_map = {
+
+    "LABEL_0": "Positive",
+
+    "LABEL_1": "Neutral",
+
+    "LABEL_2": "Negative"
+
+}
+
+# =====================================================
+# Sentiment Mapping
+# =====================================================
+emotion_map = {
+
+    "joy": "Senang",
+
+    "gratitude": "Senang",
+
+    "approval": "Senang",
+
+    "admiration": "Senang",
+
+    "anger": "Marah",
+
+    "annoyance": "Marah",
+
+    "disapproval": "Marah",
+
+    "sadness": "Sedih",
+
+    "grief": "Sedih",
+
+    "disappointment": "Sedih",
+
+    "fear": "Frustasi",
+
+    "frustration": "Frustasi",
+
+    "confusion": "Frustasi"
+
+}
+
+# =====================================================
+# Translate
+# =====================================================
+
+def translate(text):
+
+    try:
+
+        return GoogleTranslator(
+            source="id",
+            target="en"
+        ).translate(text)
+
+    except:
+
+        return text
+		
+		
+# =====================================================
+# Predict Sentiment
+# =====================================================
+
+
+def predict_sentiment(text):
+
+    result = teacher_sentiment(text)[0]
+
+    return pd.Series({
+
+        "sentiment":
+
+        sentiment_map.get(
+            result["label"],
+            result["label"]
+        ),
+
+        "sentiment_score":
+
+        round(
+            result["score"],
+            4
+        )
+
+    })
+	
+# =====================================================
+# Predict Emotion
+# =====================================================	
+
+def predict_emotion(text):
+
+    text = translate(text)
+
+    result = teacher_emotion(text)[0]
+
+    return pd.Series({
+
+        "emotion":
+
+        emotion_map.get(
+            result["label"],
+            result["label"]
+        ),
+
+        "emotion_score":
+
+        round(
+            result["score"],
+            4
+        )
+
+    })
+	
+	
