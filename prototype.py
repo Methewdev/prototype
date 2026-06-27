@@ -47,11 +47,8 @@ from modules.scraper import (
 # =====================================================
 
 st.set_page_config(
-
     page_title="AI Dashboard",
-
     page_icon="📊",
-
     layout="wide"
 
 )
@@ -61,13 +58,9 @@ st.set_page_config(
 # =====================================================
 
 st.markdown("""
-
 <style>
-
 .main{
-
     padding-top:1rem;
-
 }
 
 .block-container{
@@ -102,46 +95,15 @@ menggunakan Teacher Model dan IndoBERT.
 # =====================================================
 
 st.sidebar.title("⚙ Pengaturan")
-
 st.sidebar.markdown("---")
-
 st.sidebar.subheader("📂 Sumber Dataset")
-
 source = st.sidebar.radio(
-
     "Pilih Sumber Data",
 
     [
-
         "🌐 Google Play Scraping",
-
         "📁 Upload Dataset"
-
     ]
-
-)
-# =====================================================
-# SIDEBAR
-# =====================================================
-
-st.sidebar.title("⚙ Pengaturan")
-
-st.sidebar.markdown("---")
-
-st.sidebar.subheader("📂 Sumber Dataset")
-
-source = st.sidebar.radio(
-
-    "Pilih Sumber Data",
-
-    [
-
-        "🌐 Google Play Scraping",
-
-        "📁 Upload Dataset"
-
-    ]
-
 )
 # =====================================================
 # REVIEW COLUMN
