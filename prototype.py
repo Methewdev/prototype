@@ -94,17 +94,19 @@ menggunakan Teacher Model dan IndoBERT.
 # SIDEBAR
 # =====================================================
 
-st.sidebar.title("⚙ Pengaturan")
 st.sidebar.markdown("---")
-st.sidebar.subheader("📂 Sumber Dataset")
-source = st.sidebar.radio(
-    "Pilih Sumber Data",
-
-    [
-        "🌐 Google Play Scraping",
-    ]
-)
-
+col1, col2 = st.sidebar.columns(2)
+with col1:
+    scrape = st.button("🌐 Scraping")
+with col2:
+    reset = st.button("🔄 Reset")
+if reset:
+    if "df" in st.session_state:
+        del st.session_state["df"]
+    if "processed_df" in st.session_state:
+        del st.session_state["processed_df"]
+    st.success("Dataset berhasil dihapus.")
+    st.rerun()
 
 # =====================================================
 # PILIH SUMBER DATA
