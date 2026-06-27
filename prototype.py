@@ -1,47 +1,83 @@
 # =====================================================
 # LIVIN NLP ANALYSIS DASHBOARD
-# BAGIAN 1
 # =====================================================
 
 import streamlit as st
-import pandas as pd
-import plotly.express as px
+
+# =====================================================
+# Import Modules
+# =====================================================
+
+from modules.loader import (
+    upload_dataset,
+    load_dataset,
+    detect_review_column,
+    show_dataset_info
+)
+
+from modules.preprocessing import (
+    preprocessing_pipeline
+)
+
+from modules.teacher import (
+    teacher_pipeline
+)
+
+from modules.indobert import (
+    tokenizer_process,
+    embedding_process
+)
+
+from modules.dashboard import (
+    sentiment_chart,
+    emotion_chart,
+    sentiment_vs_emotion,
+    top_words
+)
 
 # =====================================================
 # PAGE CONFIG
 # =====================================================
 
 st.set_page_config(
+
     page_title="Livin NLP Analysis Dashboard",
+
     page_icon="📊",
+
     layout="wide"
+
 )
 
 # =====================================================
-# CUSTOM CSS
+# CSS
 # =====================================================
 
 st.markdown("""
+
 <style>
 
-.main {
-    padding-top: 1rem;
+.main{
+
+    padding-top:1rem;
+
 }
 
-.metric-card {
-    background-color: #FFFFFF;
-    padding: 15px;
-    border-radius: 12px;
-    border: 1px solid #EAEAEA;
-    box-shadow: 0px 2px 8px rgba(0,0,0,0.05);
+.block-container{
+
+    padding-top:2rem;
+
 }
 
-h1,h2,h3 {
-    color: #0F4C81;
+h1,h2,h3{
+
+    color:#0F4C81;
+
 }
 
 </style>
-""", unsafe_allow_html=True)
+
+""",unsafe_allow_html=True)
 
 # =====================================================
 # HEADER
@@ -50,142 +86,117 @@ h1,h2,h3 {
 st.title("📊 Livin NLP Analysis Dashboard")
 
 st.markdown("""
-Dashboard ini digunakan untuk menampilkan proses NLP secara lengkap:
-
-**Review → Cleaning → Case Folding → Normalization → Tokenization → Stopword Removal → Stemming → Teacher Sentiment → Teacher Emotion → IndoBERT Tokenizer → Embedding → Dashboard Analytics**
+Prototype Analisis Sentiment dan Emotion Review Livin' by Mandiri
+menggunakan Teacher Model dan IndoBERT.
 """)
 
 # =====================================================
 # SIDEBAR
 # =====================================================
 
-with st.sidebar:
+st.sidebar.title("⚙ Pengaturan")
 
-    st.header("⚙️ Pengaturan")
-
-    uploaded_file = st.file_uploader(
-        "📁 Upload Dataset",
-        type=["csv", "xlsx"]
-    )
+uploaded_file = upload_dataset()
 
 # =====================================================
-# LOAD DATASET
+# DATASET
 # =====================================================
 
-df = None
+if uploaded_file is None:
 
-if uploaded_file is not None:
-
-    try:
-
-        # Excel
-        if uploaded_file.name.endswith(".xlsx"):
-
-            df = pd.read_excel(
-                uploaded_file,
-                engine="openpyxl"
-            )
-
-        # CSV
-        else:
-
-            try:
-
-                df = pd.read_csv(
-                    uploaded_file,
-                    sep=";",
-                    on_bad_lines="skip"
-                )
-
-            except:
-
-                uploaded_file.seek(0)
-
-                df = pd.read_csv(
-                    uploaded_file,
-                    sep=",",
-                    on_bad_lines="skip"
-                )
-
-        st.sidebar.success(
-            f"✅ Dataset berhasil dimuat ({len(df)} review)"
-        )
-
-    except Exception as e:
-
-        st.error(
-            f"Gagal membaca file: {e}"
-        )
-
-        st.stop()
-
-else:
-
-    st.info(
-        "📁 Silakan upload dataset terlebih dahulu."
-    )
+    st.info("Silakan upload dataset terlebih dahulu.")
 
     st.stop()
 
+df = load_dataset(uploaded_file)
+
+review_col = detect_review_column(df)
+
+show_dataset_info(df)
+
 # =====================================================
-# AUTO DETECT REVIEW COLUMN
+# SESSION STATE
 # =====================================================
 
-review_candidates = [
-    "content",
-    "review",
-    "comment",
-    "ulasan",
-    "text"
-]
+if "processed_df" not in st.session_state:
 
-review_col = None
+    st.session_state.processed_df = None
 
-for col in review_candidates:
+# =====================================================
+# BUTTON
+# =====================================================
 
-    if col in df.columns:
+run = st.sidebar.button(
+    "🚀 Jalankan Analisis"
+)
 
-        review_col = col
-        break
+# =====================================================
+# PREPROCESSING
+# =====================================================
 
-# fallback manual
-if review_col is None:
+if run:
 
-    review_col = st.sidebar.selectbox(
-        "Pilih Kolom Review",
-        df.columns
+    with st.spinner("Melakukan preprocessing..."):
+
+        process_df = preprocessing_pipeline(
+            df,
+            review_col
+        )
+
+    with st.spinner("Menjalankan Teacher Model..."):
+
+        process_df = teacher_pipeline(
+            process_df
+        )
+
+    st.session_state.processed_df = process_df
+
+    st.success(
+        "Analisis berhasil dilakukan."
     )
 
-else:
-
-    st.sidebar.success(
-        f"📝 Kolom Review : {review_col}"
-    )
-
 # =====================================================
-# DATASET INFO
+# TAB
 # =====================================================
 
-with st.sidebar:
+tab1,\
+tab2,\
+tab3,\
+tab4,\
+tab5,\
+tab6,\
+tab7,\
+tab8,\
+tab9,\
+tab10,\
+tab11,\
+tab12 = st.tabs([
 
-    st.markdown("---")
+"📊 Data Understanding",
 
-    st.subheader("📌 Informasi Dataset")
+"🧹 Cleaning",
 
-    st.write(f"Baris : {len(df)}")
-    st.write(f"Kolom : {len(df.columns)}")
+"🔤 Case Folding",
 
-# =====================================================
-# TABS
-# =====================================================
+"📝 Normalization",
 
-tab1 = st.tabs([
-    "📊 Data Understanding"
-])[0]
+"🔪 Tokenization",
 
-# =====================================================
-# TAB 1
-# =====================================================
+"🚫 Stopword Removal",
+
+"🌱 Stemming",
+
+"😊 Teacher Sentiment",
+
+"😡 Teacher Emotion",
+
+"🤖 IndoBERT Tokenizer",
+
+"🔢 IndoBERT Embedding",
+
+"📈 Dashboard"
+
+])
 
 # =====================================================
 # TAB 1 : DATA UNDERSTANDING
@@ -193,11 +204,20 @@ tab1 = st.tabs([
 
 with tab1:
 
-    st.subheader("📊 Data Understanding")
+    st.header("📊 Data Understanding")
 
-    # ==========================
-    # Metrics
-    # ==========================
+    st.write(
+        """
+        Tahap Data Understanding bertujuan untuk memahami karakteristik dataset
+        sebelum dilakukan preprocessing dan analisis menggunakan model NLP.
+        """
+    )
+
+    st.markdown("---")
+
+    # =====================================================
+    # METRIC
+    # =====================================================
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -224,15 +244,15 @@ with tab1:
     )
 
     col4.metric(
-        "Rata-rata Panjang Review",
+        "Rata-rata Karakter",
         round(avg_length)
     )
 
     st.markdown("---")
 
-    # ==========================
-    # Preview Dataset
-    # ==========================
+    # =====================================================
+    # PREVIEW DATASET
+    # =====================================================
 
     st.subheader("📄 Preview Dataset")
 
@@ -243,15 +263,18 @@ with tab1:
 
     st.markdown("---")
 
-    # ==========================
-    # Informasi Kolom
-    # ==========================
+    # =====================================================
+    # INFORMASI KOLOM
+    # =====================================================
 
-    st.subheader("📋 Informasi Kolom")
+    st.subheader("📋 Informasi Dataset")
 
     info_df = pd.DataFrame({
-        "Column": df.columns,
-        "Type": df.dtypes.astype(str)
+
+        "Kolom": df.columns,
+
+        "Tipe Data": df.dtypes.astype(str)
+
     })
 
     st.dataframe(
@@ -261,15 +284,18 @@ with tab1:
 
     st.markdown("---")
 
-    # ==========================
-    # Missing Value
-    # ==========================
+    # =====================================================
+    # MISSING VALUE
+    # =====================================================
 
     st.subheader("📌 Missing Value")
 
     missing_df = pd.DataFrame({
-        "Column": df.columns,
-        "Missing": df.isnull().sum()
+
+        "Kolom": df.columns,
+
+        "Jumlah Missing": df.isnull().sum()
+
     })
 
     st.dataframe(
@@ -279,658 +305,364 @@ with tab1:
 
     st.markdown("---")
 
-    # ==========================
-    # Distribusi Rating
-    # ==========================
+    # =====================================================
+    # DISTRIBUSI RATING
+    # =====================================================
 
     if "score" in df.columns:
 
         st.subheader("⭐ Distribusi Rating")
 
-        rating_count = (
+        rating = (
+
             df["score"]
+
             .value_counts()
+
             .sort_index()
+
             .reset_index()
+
         )
 
-        rating_count.columns = [
+        rating.columns = [
+
             "Rating",
-            "Total"
+
+            "Jumlah"
+
         ]
 
         fig = px.bar(
-            rating_count,
+
+            rating,
+
             x="Rating",
-            y="Total",
-            text="Total",
-            title="Distribusi Rating Pengguna"
+
+            y="Jumlah",
+
+            text="Jumlah",
+
+            title="Distribusi Rating"
+
+        )
+
+        fig.update_layout(
+            xaxis_title="Rating",
+            yaxis_title="Jumlah Review"
         )
 
         st.plotly_chart(
             fig,
             width="stretch"
         )
-# =====================================================
-# SESSION STATE
-# =====================================================
 
-if "processed_df" not in st.session_state:
+    else:
 
-    st.session_state.processed_df = df
-
-# =====================================================
-# LIBRARY
-# =====================================================
-
-import re
-
-from Sastrawi.Stemmer.StemmerFactory import (
-    StemmerFactory
-)
-
-from Sastrawi.StopWordRemover.StopWordRemoverFactory import (
-    StopWordRemoverFactory
-)
-
-
-# =====================================================
-# Dictionary Normalisasi
-# =====================================================
-
-normalization_dict = {
-
-    "gk": "tidak",
-    "ga": "tidak",
-    "yg": "yang",
-    "bgt": "banget",
-    "udh": "sudah",
-    "tp": "tapi",
-    "dr": "dari",
-    "dgn": "dengan",
-    "krn": "karena"
-
-}
-
-# =====================================================
-# Stopword & Stemmer
-# =====================================================
-
-stop_factory = (
-    StopWordRemoverFactory()
-)
-
-stop_words = set(
-    stop_factory.get_stop_words()
-)
-
-stemmer = (
-    StemmerFactory()
-    .create_stemmer()
-)
-
-
-# =====================================================
-# Cleaning Function
-# =====================================================
-
-def cleaning(text):
-
-    text = str(text)
-
-    text = re.sub(
-        r"http\\S+",
-        "",
-        text
-    )
-
-    text = re.sub(
-        r"www\\S+",
-        "",
-        text
-    )
-
-    text = re.sub(
-        r"[^a-zA-Z\\s]",
-        " ",
-        text
-    )
-
-    text = re.sub(
-        r"\\s+",
-        " ",
-        text
-    )
-
-    return text.strip()
-	
-# =====================================================
-# Case Folding
-# =====================================================
-
-def case_folding(text):
-
-    return text.lower()
-	
-	
-# =====================================================
-# Normalization
-# =====================================================
-
-def normalize(text):
-
-    words = text.split()
-
-    words = [
-
-        normalization_dict.get(
-            word,
-            word
+        st.info(
+            "Kolom 'score' tidak ditemukan."
         )
-
-        for word in words
-
-    ]
-
-    return " ".join(words)
-	
-	
-# =====================================================
-# Tokenization
-# =====================================================
-
-def tokenize(text):
-
-    return text.split()
-	
-# =====================================================
-# Stopword Removal
-# =====================================================
-
-def remove_stopwords(tokens):
-
-    return [
-
-        word
-
-        for word in tokens
-
-        if word not in stop_words
-
-    ]
-
-# =====================================================
-# Stemming
-# =====================================================
-
-def stemming(tokens):
-
-    return [
-
-        stemmer.stem(word)
-
-        for word in tokens
-
-    ]
-	
-	
-# =====================================================
-# Buttonn Analis
-# =====================================================
-
-
-run_preprocessing = st.sidebar.button(
-    "🚀 Jalankan Analisis"
-)
-with st.spinner("Teacher Sentiment..."):
-
-    sentiment_result = process_df[
-        "final_text"
-    ].apply(
-        predict_sentiment
-    )
-
-process_df = pd.concat(
-
-    [
-        process_df,
-        sentiment_result
-    ],
-
-    axis=1
-)
-with st.spinner("Teacher Emotion..."):
-
-    emotion_result = process_df[
-        "final_text"
-    ].apply(
-        predict_emotion
-    )
-
-process_df = pd.concat(
-
-    [
-        process_df,
-        emotion_result
-    ],
-
-    axis=1
-)
-st.session_state.processed_df = process_df
-# =====================================================
-# Generate Pipeline
-# =====================================================
-
-if run_preprocessing:
-
-    process_df = df.copy()
-
-    process_df["cleaning"] = (
-        process_df[review_col]
-        .apply(cleaning)
-    )
-
-    process_df["casefold"] = (
-        process_df["cleaning"]
-        .apply(case_folding)
-    )
-
-    process_df["normalisasi"] = (
-        process_df["casefold"]
-        .apply(normalize)
-    )
-
-    process_df["token"] = (
-        process_df["normalisasi"]
-        .apply(tokenize)
-    )
-
-    process_df["stopword"] = (
-        process_df["token"]
-        .apply(remove_stopwords)
-    )
-
-    process_df["stemming"] = (
-        process_df["stopword"]
-        .apply(stemming)
-    )
-
-    process_df["final_text"] = (
-        process_df["stemming"]
-        .apply(
-            lambda x: " ".join(x)
-        )
-    )
-
-    st.session_state.processed_df = (
-        process_df
-    )
-# =====================================================
-# Struktur Tabs
-# =====================================================
-tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
-
-    "🧹 Cleaning",
-
-    "🔤 Case Folding",
-
-    "📝 Normalization",
-
-    "🔪 Tokenization",
-
-    "🚫 Stopword Removal",
-
-    "🌱 Stemming"
-	
-	"😊 Teacher Sentiment",
-
-    "😡 Teacher Emotion"
-
-])
-
-# =====================================================
-# Tab Cleaning
+		# =====================================================
+# TAB 2 : CLEANING
 # =====================================================
 
 with tab2:
 
-    st.subheader(
-        "Text Cleaning"
-    )
+    st.header("🧹 Text Cleaning")
 
-    if "cleaning" in st.session_state.processed_df.columns:
+    st.write("""
+    Tahap **Cleaning** bertujuan membersihkan teks dari karakter
+    yang tidak diperlukan sebelum diproses lebih lanjut.
+
+    Karakter yang dihapus meliputi:
+
+    - URL
+    - Mention (@username)
+    - Hashtag (#)
+    - Angka
+    - Emoji
+    - Simbol
+    - Spasi berlebih
+    """)
+
+    # ===========================
+    # CEK HASIL ANALISIS
+    # ===========================
+
+    if st.session_state.processed_df is None:
+
+        st.warning(
+            "Silakan klik **Jalankan Analisis** terlebih dahulu."
+        )
+
+    else:
+
+        process_df = st.session_state.processed_df
+
+        st.markdown("---")
+
+        st.subheader("📊 Statistik Cleaning")
+
+        total_review = len(process_df)
+
+        total_char_before = (
+            process_df[review_col]
+            .astype(str)
+            .str.len()
+            .sum()
+        )
+
+        total_char_after = (
+            process_df["cleaning"]
+            .astype(str)
+            .str.len()
+            .sum()
+        )
+
+        removed_char = total_char_before - total_char_after
+
+        col1, col2, col3 = st.columns(3)
+
+        col1.metric(
+            "Jumlah Review",
+            total_review
+        )
+
+        col2.metric(
+            "Karakter Sebelum",
+            f"{total_char_before:,}"
+        )
+
+        col3.metric(
+            "Karakter Dihapus",
+            f"{removed_char:,}"
+        )
+
+        st.markdown("---")
+
+        st.subheader("🔍 Contoh Hasil Cleaning")
+
+        preview = process_df[[
+            review_col,
+            "cleaning"
+        ]].copy()
+
+        preview.columns = [
+            "Review Asli",
+            "Hasil Cleaning"
+        ]
+
+        st.dataframe(
+            preview.head(20),
+            width="stretch"
+        )
+
+        st.markdown("---")
+
+        st.subheader("📄 Detail Perubahan")
+
+        index = st.number_input(
+            "Pilih Index Data",
+            0,
+            len(process_df)-1,
+            0
+        )
+
+        st.write("### Sebelum")
+
+        st.info(
+            process_df.loc[
+                index,
+                review_col
+            ]
+        )
+
+        st.write("### Sesudah")
+
+        st.success(
+            process_df.loc[
+                index,
+                "cleaning"
+            ]
+        )
+
+        st.markdown("---")
+
+        st.subheader("📋 Hasil Cleaning")
 
         st.dataframe(
 
-            st.session_state.processed_df[
+            process_df[
                 [
                     review_col,
                     "cleaning"
                 ]
-            ].head(20),
+            ],
 
-            use_container_width=True
+            width="stretch"
 
         )
-
-# =====================================================
-# Case Folding
+		# =====================================================
+# TAB 3 : CASE FOLDING
 # =====================================================
 
 with tab3:
 
-    st.subheader(
-        "Case Folding"
-    )
+    st.header("🔤 Case Folding")
 
-    if "casefold" in st.session_state.processed_df.columns:
+    st.write("""
+    Tahap **Case Folding** bertujuan mengubah seluruh huruf menjadi
+    huruf kecil (lowercase).
+
+    Contoh:
+
+    **'Aplikasi BAGUS Sekali'**
+
+    menjadi
+
+    **'aplikasi bagus sekali'**
+    """)
+
+    # =====================================================
+    # Cek hasil preprocessing
+    # =====================================================
+
+    if st.session_state.processed_df is None:
+
+        st.warning(
+            "Silakan klik **Jalankan Analisis** terlebih dahulu."
+        )
+
+    else:
+
+        process_df = st.session_state.processed_df
+
+        st.markdown("---")
+
+        # =====================================================
+        # Statistik
+        # =====================================================
+
+        st.subheader("📊 Statistik Case Folding")
+
+        total_review = len(process_df)
+
+        total_upper = sum(
+
+            sum(
+                1
+                for c in str(text)
+                if c.isupper()
+            )
+
+            for text in process_df["cleaning"]
+
+        )
+
+        col1, col2 = st.columns(2)
+
+        col1.metric(
+            "Jumlah Review",
+            total_review
+        )
+
+        col2.metric(
+            "Huruf Kapital",
+            total_upper
+        )
+
+        st.markdown("---")
+
+        # =====================================================
+        # Contoh Hasil
+        # =====================================================
+
+        st.subheader("🔍 Contoh Case Folding")
+
+        preview = process_df[
+            [
+                "cleaning",
+                "casefold"
+            ]
+        ].copy()
+
+        preview.columns = [
+
+            "Sebelum",
+
+            "Sesudah"
+
+        ]
 
         st.dataframe(
 
-            st.session_state.processed_df[
+            preview.head(20),
+
+            width="stretch"
+
+        )
+
+        st.markdown("---")
+
+        # =====================================================
+        # Detail Perubahan
+        # =====================================================
+
+        st.subheader("📄 Detail Perubahan")
+
+        index = st.number_input(
+
+            "Pilih Index",
+
+            min_value=0,
+
+            max_value=len(process_df)-1,
+
+            value=0,
+
+            key="casefold_index"
+
+        )
+
+        st.write("### Sebelum")
+
+        st.info(
+
+            process_df.loc[
+                index,
+                "cleaning"
+            ]
+
+        )
+
+        st.write("### Sesudah")
+
+        st.success(
+
+            process_df.loc[
+                index,
+                "casefold"
+            ]
+
+        )
+
+        st.markdown("---")
+
+        # =====================================================
+        # Tabel
+        # =====================================================
+
+        st.subheader("📋 Hasil Case Folding")
+
+        st.dataframe(
+
+            process_df[
                 [
                     "cleaning",
                     "casefold"
                 ]
-            ].head(20),
+            ],
 
-            use_container_width=True
-
-        )
-		
-# =====================================================
-# Normalization
-# =====================================================
-with tab4:
-
-    st.subheader(
-        "Normalization"
-    )
-
-    if "normalisasi" in st.session_state.processed_df.columns:
-
-        st.dataframe(
-
-            st.session_state.processed_df[
-                [
-                    "casefold",
-                    "normalisasi"
-                ]
-            ].head(20),
-
-            use_container_width=True
+            width="stretch"
 
         )
-# =====================================================
-# Tokenization
-# =====================================================
-with tab5:
-
-    st.subheader(
-        "Tokenization"
-    )
-
-    if "token" in st.session_state.processed_df.columns:
-
-        st.dataframe(
-
-            st.session_state.processed_df[
-                [
-                    "normalisasi",
-                    "token"
-                ]
-            ].head(20),
-
-            use_container_width=True
-
-        )
-# =====================================================
-# Stopword Removal
-# =====================================================
-with tab6:
-
-    st.subheader(
-        "Stopword Removal"
-    )
-
-    if "stopword" in st.session_state.processed_df.columns:
-
-        st.dataframe(
-
-            st.session_state.processed_df[
-                [
-                    "token",
-                    "stopword"
-                ]
-            ].head(20),
-
-            use_container_width=True
-
-        )
-# =====================================================
-# Stemming
-# =====================================================
-with tab7:
-
-    st.subheader(
-        "Stemming"
-    )
-
-    if "final_text" in st.session_state.processed_df.columns:
-
-        st.dataframe(
-
-            st.session_state.processed_df[
-                [
-                    "stopword",
-                    "stemming",
-                    "final_text"
-                ]
-            ].head(20),
-
-            use_container_width=True
-
-        )
-		
-# =====================================================
-# Teacher Sentiment
-# =====================================================
-
-with tab8:
-
-    st.subheader("Teacher Sentiment")
-
-    st.dataframe(
-
-        st.session_state.processed_df[
-            [
-                "final_text",
-                "sentiment",
-                "sentiment_score"
-            ]
-        ],
-
-        width="stretch"
-    )
-	
-# =====================================================
-# Teacher Emotion
-# =====================================================
-with tab9:
-
-    st.subheader("Teacher Emotion")
-
-    st.dataframe(
-
-        st.session_state.processed_df[
-            [
-                "final_text",
-                "emotion",
-                "emotion_score"
-            ]
-        ],
-
-        width="stretch"
-    )
-
-# =====================================================
-# Library
-# =====================================================
-from transformers import pipeline
-
-from deep_translator import GoogleTranslator
-
-# =====================================================
-# LOAD TEACHER SENTIMENT
-# =====================================================
-
-@st.cache_resource
-def load_teacher_sentiment():
-
-    return pipeline(
-        "text-classification",
-        model="mdhugol/indonesia-bert-sentiment-classification"
-    )
-
-
-# =====================================================
-# LOAD TEACHER EMOTION
-# =====================================================
-
-@st.cache_resource
-def load_teacher_emotion():
-
-    return pipeline(
-        "text-classification",
-        model="SamLowe/roberta-base-go_emotions"
-    )
-	
-# =====================================================
-# LOAD MODEL
-# =====================================================
-
-teacher_sentiment = load_teacher_sentiment()
-
-teacher_emotion = load_teacher_emotion()
-
-
-# =====================================================
-# Sentiment Mapping
-# =====================================================
-sentiment_map = {
-
-    "LABEL_0": "Positive",
-
-    "LABEL_1": "Neutral",
-
-    "LABEL_2": "Negative"
-
-}
-
-# =====================================================
-# Sentiment Mapping
-# =====================================================
-emotion_map = {
-
-    "joy": "Senang",
-
-    "gratitude": "Senang",
-
-    "approval": "Senang",
-
-    "admiration": "Senang",
-
-    "anger": "Marah",
-
-    "annoyance": "Marah",
-
-    "disapproval": "Marah",
-
-    "sadness": "Sedih",
-
-    "grief": "Sedih",
-
-    "disappointment": "Sedih",
-
-    "fear": "Frustasi",
-
-    "frustration": "Frustasi",
-
-    "confusion": "Frustasi"
-
-}
-
-# =====================================================
-# Translate
-# =====================================================
-
-def translate(text):
-
-    try:
-
-        return GoogleTranslator(
-            source="id",
-            target="en"
-        ).translate(text)
-
-    except:
-
-        return text
-		
-		
-# =====================================================
-# Predict Sentiment
-# =====================================================
-
-
-def predict_sentiment(text):
-
-    result = teacher_sentiment(text)[0]
-
-    return pd.Series({
-
-        "sentiment":
-
-        sentiment_map.get(
-            result["label"],
-            result["label"]
-        ),
-
-        "sentiment_score":
-
-        round(
-            result["score"],
-            4
-        )
-
-    })
-	
-# =====================================================
-# Predict Emotion
-# =====================================================	
-
-def predict_emotion(text):
-
-    text = translate(text)
-
-    result = teacher_emotion(text)[0]
-
-    return pd.Series({
-
-        "emotion":
-
-        emotion_map.get(
-            result["label"],
-            result["label"]
-        ),
-
-        "emotion_score":
-
-        round(
-            result["score"],
-            4
-        )
-
-    })
-	
-	
