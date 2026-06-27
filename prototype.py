@@ -94,19 +94,34 @@ menggunakan Teacher Model dan IndoBERT.
 # SIDEBAR
 # =====================================================
 
+st.sidebar.title("⚙ Pengaturan")
 st.sidebar.markdown("---")
-col1, col2 = st.sidebar.columns(2)
-with col1:
-    scrape = st.button("🌐 Scraping")
-with col2:
-    reset = st.button("🔄 Reset")
-if reset:
-    if "df" in st.session_state:
-        del st.session_state["df"]
-    if "processed_df" in st.session_state:
-        del st.session_state["processed_df"]
-    st.success("Dataset berhasil dihapus.")
-    st.rerun()
+
+st.sidebar.subheader("🌐 Google Play Scraping")
+
+app_name = st.sidebar.selectbox(
+    "Pilih Mobile Banking",
+    list(APP_MAPPING.keys())
+)
+
+total_review = st.sidebar.slider(
+    "Jumlah Review",
+    100,
+    3000,
+    500,
+    100
+)
+
+if st.sidebar.button("🌐 Scraping Review"):
+
+    with st.spinner("Mengambil data..."):
+
+        df = scrape_google_play(
+            app_name,
+            total_review
+        )
+
+    st.session_state.df = df
 
 # =====================================================
 # PILIH SUMBER DATA
