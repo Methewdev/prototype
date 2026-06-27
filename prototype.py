@@ -187,9 +187,17 @@ tab1 = st.tabs([
 # TAB 1
 # =====================================================
 
+# =====================================================
+# TAB 1 : DATA UNDERSTANDING
+# =====================================================
+
 with tab1:
 
-	st.subheader("📊 Data Understanding")
+    st.subheader("📊 Data Understanding")
+
+    # ==========================
+    # Metrics
+    # ==========================
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -222,62 +230,87 @@ with tab1:
 
     st.markdown("---")
 
-	st.subheader("Preview Dataset")
-	st.dataframe(
-    df.head(10),
-    width="stretch"
-	)
-	st.markdown("---")
+    # ==========================
+    # Preview Dataset
+    # ==========================
 
-	st.subheader("Informasi Kolom")
+    st.subheader("📄 Preview Dataset")
+
+    st.dataframe(
+        df.head(10),
+        width="stretch"
+    )
+
+    st.markdown("---")
+
+    # ==========================
+    # Informasi Kolom
+    # ==========================
+
+    st.subheader("📋 Informasi Kolom")
 
     info_df = pd.DataFrame({
         "Column": df.columns,
         "Type": df.dtypes.astype(str)
     })
-	st.dataframe(
+
+    st.dataframe(
         info_df,
         width="stretch"
     )
-	st.markdown("---")
-	st.subheader("Missing Value")
+
+    st.markdown("---")
+
+    # ==========================
+    # Missing Value
+    # ==========================
+
+    st.subheader("📌 Missing Value")
 
     missing_df = pd.DataFrame({
         "Column": df.columns,
         "Missing": df.isnull().sum()
     })
-	st.dataframe(
+
+    st.dataframe(
         missing_df,
         width="stretch"
     )
 
-    # Rating Distribution
+    st.markdown("---")
+
+    # ==========================
+    # Distribusi Rating
+    # ==========================
+
     if "score" in df.columns:
 
-    st.markdown("---")
-    st.subheader("Distribusi Rating")
-     rating_count = (
-         df["score"]
-         .value_counts()
-         .sort_index()
-         .reset_index()
-     )
+        st.subheader("⭐ Distribusi Rating")
 
-    rating_count.columns = [
-        "Rating",
-         "Total"
-     ]
+        rating_count = (
+            df["score"]
+            .value_counts()
+            .sort_index()
+            .reset_index()
+        )
+
+        rating_count.columns = [
+            "Rating",
+            "Total"
+        ]
+
         fig = px.bar(
             rating_count,
             x="Rating",
             y="Total",
-            text="Total"
-    )
-    st.plotly_chart(
-        fig,
-        width="stretch"
-    )
+            text="Total",
+            title="Distribusi Rating Pengguna"
+        )
 
+        st.plotly_chart(
+            fig,
+            width="stretch"
+        )
 # =====================================================
 # SESSION STATE
 # =====================================================
