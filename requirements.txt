@@ -12,3 +12,4 @@ protobuf>=4.25.3
 Sastrawi>=1.0.1
 deep-translator>=1.11.4
 scikit-learn>=1.5.0
+google-play-scraper==1.2.7
