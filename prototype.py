@@ -230,19 +230,7 @@ with tab1:
 
     st.markdown("---")
 
-    # ==========================
-    # Preview Dataset
-    # ==========================
-
-    st.subheader("📄 Preview Dataset")
-
-    st.dataframe(
-        df.head(10),
-        width="stretch"
-    )
-
-    st.markdown("---")
-
+   
     # ==========================
     # Informasi Kolom
     # ==========================
@@ -576,6 +564,18 @@ with tab2:
             use_container_width=True
 
         )
+ # ==========================
+ # Preview Dataset
+ # ==========================
+
+    st.subheader("📄 Preview Dataset")
+
+    st.dataframe(
+        df.head(10),
+        width="stretch"
+    )
+
+    st.markdown("---")
 
 # =====================================================
 # Case Folding
