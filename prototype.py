@@ -323,8 +323,9 @@ with tab1:
     st.subheader("📄 Preview Dataset")
 
     st.dataframe(
-        df.head(10),
-        width="stretch"
+        df,
+        width="stretch",
+        hide_index=True
     )
 
     st.markdown("---")
@@ -518,8 +519,9 @@ with tab2:
         ]
 
         st.dataframe(
-            preview.head(20),
-            width="stretch"
+            preview,
+            width="stretch",
+            hide_index=True
         )
 
         st.markdown("---")
@@ -661,9 +663,9 @@ with tab3:
 
         st.dataframe(
 
-            preview.head(20),
-
-            width="stretch"
+            preview,
+            width="stretch",
+            hide_index=True
 
         )
 
@@ -786,8 +788,9 @@ with tab4:
         ]
 
         st.dataframe(
-            preview.head(20),
-            width="stretch"
+            preview,
+            width="stretch",
+            hide_index=True
         )
 
         st.markdown("---")
@@ -843,8 +846,9 @@ with tab5:
         ]
 
         st.dataframe(
-            preview.head(20),
-            width="stretch"
+            preview,
+            width="stretch",
+            hide_index=True
         )
 
         idx = st.number_input(
@@ -885,9 +889,10 @@ with tab6:
                     "token",
                     "stopword"
                 ]
-            ].head(20),
+            ],
 
-            width="stretch"
+            width="stretch",
+            hide_index=True
 
         )
 
@@ -935,9 +940,10 @@ with tab7:
                     "stopword",
                     "stemming"
                 ]
-            ].head(20),
-
-            width="stretch"
+            ],
+            
+            width="stretch",
+            hide_index=True
 
         )
 
