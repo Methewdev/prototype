@@ -1,4 +1,17 @@
 # =====================================================
+# SIDEBAR
+# =====================================================
+
+with st.sidebar:
+
+    st.header("⚙️ Pengaturan")
+
+    uploaded_file = st.file_uploader(
+        "📁 Upload Dataset",
+        type=["csv", "xlsx"]
+    )
+
+# =====================================================
 # LOAD DATASET
 # =====================================================
 
@@ -91,24 +104,3 @@ else:
     st.sidebar.success(
         f"📝 Kolom Review : {review_col}"
     )
-
-# =====================================================
-# DATASET INFO
-# =====================================================
-
-with st.sidebar:
-
-    st.markdown("---")
-
-    st.subheader("📌 Informasi Dataset")
-
-    st.write(f"Baris : {len(df)}")
-    st.write(f"Kolom : {len(df.columns)}")
-
-# =====================================================
-# TABS
-# =====================================================
-
-tab1 = st.tabs([
-    "📊 Data Understanding"
-])[0]
