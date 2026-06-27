@@ -136,7 +136,7 @@ df = st.session_state.df
 # UPLOAD DATASET
 # =====================================================
 
-else:
+   else:
 
     uploaded_file = upload_dataset()
 
