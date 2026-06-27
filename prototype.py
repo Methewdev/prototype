@@ -105,18 +105,7 @@ source = st.sidebar.radio(
         "📁 Upload Dataset"
     ]
 )
-# =====================================================
-# REVIEW COLUMN
-# =====================================================
 
-if source == "🌐 Google Play Scraping":
-
-    review_col = "content"
-
-else:
-
-    review_col = detect_review_column(df)
-    show_dataset_info(df)
 # =====================================================
 # LOAD DATASET
 # =====================================================
@@ -132,6 +121,18 @@ if "df" not in st.session_state:
     st.stop()
 
 df = st.session_state.df
+# =====================================================
+# REVIEW COLUMN
+# =====================================================
+
+if source == "🌐 Google Play Scraping":
+
+    review_col = "content"
+
+else:
+
+    review_col = detect_review_column(df)
+    show_dataset_info(df)
 # =====================================================
 # PILIH SUMBER DATA
 # =====================================================
