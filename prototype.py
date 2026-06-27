@@ -38,7 +38,10 @@ from mdoules.dashboard import (
     top_words,
     download_result
 )
-
+from modules.scraper import (
+    scrape_google_play,
+    APP_MAPPING
+)
 # =====================================================
 # PAGE CONFIG
 # =====================================================
@@ -100,25 +103,92 @@ menggunakan Teacher Model dan IndoBERT.
 
 st.sidebar.title("⚙ Pengaturan")
 
-uploaded_file = upload_dataset()
+st.sidebar.markdown("---")
 
+st.sidebar.subheader("📂 Sumber Dataset")
+
+source = st.sidebar.radio(
+
+    "Pilih Sumber Data",
+
+    [
+
+        "🌐 Google Play Scraping",
+
+        "📁 Upload Dataset"
+
+    ]
+
+)
 # =====================================================
-# DATASET
+# SIDEBAR
 # =====================================================
 
-if uploaded_file is None:
+st.sidebar.title("⚙ Pengaturan")
 
-    st.info("Silakan upload dataset terlebih dahulu.")
+st.sidebar.markdown("---")
+
+st.sidebar.subheader("📂 Sumber Dataset")
+
+source = st.sidebar.radio(
+
+    "Pilih Sumber Data",
+
+    [
+
+        "🌐 Google Play Scraping",
+
+        "📁 Upload Dataset"
+
+    ]
+
+)
+# =====================================================
+# REVIEW COLUMN
+# =====================================================
+
+if source == "🌐 Google Play Scraping":
+
+    review_col = "content"
+
+else:
+
+    review_col = detect_review_column(df)
+    show_dataset_info(df)
+# =====================================================
+# LOAD DATASET
+# =====================================================
+
+if "df" not in st.session_state:
+
+    st.info(
+
+        "Silakan lakukan Scraping atau Upload Dataset."
+
+    )
 
     st.stop()
 
-df = load_dataset(uploaded_file)
+df = st.session_state.df
+# =====================================================
+# UPLOAD DATASET
+# =====================================================
 
-review_col = detect_review_column(df)
+else:
 
-show_dataset_info(df)
+    uploaded_file = upload_dataset()
 
+    if uploaded_file:
 
+        df = load_dataset(uploaded_file)
+
+        st.session_state.df = df
+
+        st.sidebar.success(
+
+            f"Dataset berhasil dimuat ({len(df)} review)"
+
+        )
 # =====================================================
 # DATA SOURCE
 # =====================================================
