@@ -133,43 +133,56 @@ if "df" not in st.session_state:
 
 df = st.session_state.df
 # =====================================================
-# UPLOAD DATASET
+# PILIH SUMBER DATA
 # =====================================================
 
-   else:
+if source == "🌐 Google Play Scraping":
+
+    app_name = st.sidebar.selectbox(
+        "📱 Pilih Mobile Banking",
+        list(APP_MAPPING.keys())
+    )
+
+    total_review = st.sidebar.slider(
+        "Jumlah Review",
+        100,
+        3000,
+        500,
+        100
+    )
+
+    if st.sidebar.button("🌐 Scraping Review"):
+
+        with st.spinner("Mengambil review..."):
+
+            df = scrape_google_play(
+                app_name,
+                total_review
+            )
+
+        st.session_state.df = df
+
+        st.sidebar.success(
+            f"{len(df)} review berhasil diambil."
+        )
+
+# ===========================
+# UPLOAD DATASET
+# ===========================
+
+else:
 
     uploaded_file = upload_dataset()
 
-    if uploaded_file:
+    if uploaded_file is not None:
 
         df = load_dataset(uploaded_file)
 
         st.session_state.df = df
 
         st.sidebar.success(
-
             f"Dataset berhasil dimuat ({len(df)} review)"
-
         )
-# =====================================================
-# DATA SOURCE
-# =====================================================
-
-st.sidebar.header("📂 Sumber Dataset")
-
-source = st.sidebar.radio(
-
-    "Pilih Sumber Data",
-
-    [
-
-        "Google Play Scraping",
-
-        "Upload Dataset"
-
-    ]
-
-)
 # =====================================================
 # SESSION STATE
 # =====================================================
