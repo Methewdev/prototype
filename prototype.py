@@ -118,6 +118,26 @@ review_col = detect_review_column(df)
 
 show_dataset_info(df)
 
+
+# =====================================================
+# DATA SOURCE
+# =====================================================
+
+st.sidebar.header("📂 Sumber Dataset")
+
+source = st.sidebar.radio(
+
+    "Pilih Sumber Data",
+
+    [
+
+        "Google Play Scraping",
+
+        "Upload Dataset"
+
+    ]
+
+)
 # =====================================================
 # SESSION STATE
 # =====================================================
