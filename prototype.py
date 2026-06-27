@@ -957,3 +957,216 @@ with tab9:
             width="stretch"
 
         )
+# =====================================================
+# TAB 10 : INDOBERT TOKENIZER
+# =====================================================
+
+with tab10:
+
+    st.header("🤖 IndoBERT Tokenizer")
+
+    st.write("""
+Tahap ini mengubah hasil preprocessing menjadi token yang dapat dipahami oleh model IndoBERT.
+
+Pipeline:
+
+Review
+↓
+Cleaning
+↓
+Case Folding
+↓
+Normalization
+↓
+Tokenization
+↓
+Stopword Removal
+↓
+Stemming
+↓
+Tokenizer IndoBERT
+""")
+
+    if st.session_state.processed_df is None:
+
+        st.warning("Silakan klik Jalankan Analisis terlebih dahulu.")
+
+    else:
+
+        process_df = st.session_state.processed_df
+
+        idx = st.number_input(
+            "Pilih Data",
+            0,
+            len(process_df)-1,
+            0,
+            key="bert_token"
+        )
+
+        text = process_df.loc[idx,"final_text"]
+
+        st.subheader("Final Text")
+
+        st.code(text)
+
+        result = tokenizer_process(text)
+
+        st.markdown("---")
+
+        st.subheader("Tokens")
+
+        st.write(result["tokens"])
+
+        st.markdown("---")
+
+        st.subheader("Input IDs")
+
+        st.write(result["input_ids"])
+
+        st.markdown("---")
+
+        st.subheader("Attention Mask")
+
+        st.write(result["attention_mask"])
+
+        st.markdown("---")
+
+        st.metric(
+            "Jumlah Token",
+            len(result["tokens"])
+        )
+# =====================================================
+# TAB 11 : INDOBERT EMBEDDING
+# =====================================================
+
+with tab11:
+
+    st.header("🔢 IndoBERT Embedding")
+
+    st.write("""
+Embedding merupakan representasi numerik dari setiap review
+yang dihasilkan oleh model IndoBERT.
+
+Embedding inilah yang menjadi input model Machine Learning.
+""")
+
+    if st.session_state.processed_df is None:
+
+        st.warning("Silakan klik Jalankan Analisis.")
+
+    else:
+
+        process_df = st.session_state.processed_df
+
+        idx = st.number_input(
+            "Pilih Data",
+            0,
+            len(process_df)-1,
+            0,
+            key="embedding"
+        )
+
+        text = process_df.loc[idx,"final_text"]
+
+        embedding = embedding_process(text)
+
+        st.subheader("Embedding Shape")
+
+        st.write(embedding.shape)
+
+        st.markdown("---")
+
+        st.subheader("Embedding Matrix")
+
+        st.dataframe(
+            embedding,
+            width="stretch"
+        )
+
+        st.markdown("---")
+
+        st.metric(
+            "Dimensi Embedding",
+            embedding.shape[1]
+        )
+# =====================================================
+# TAB 12 : DASHBOARD
+# =====================================================
+
+with tab12:
+
+    st.header("📈 Dashboard Analytics")
+
+    if st.session_state.processed_df is None:
+
+        st.warning("Silakan klik Jalankan Analisis.")
+
+    else:
+
+        process_df = st.session_state.processed_df
+
+        st.subheader("Ringkasan Dataset")
+
+        c1,c2,c3,c4 = st.columns(4)
+
+        c1.metric(
+            "Jumlah Review",
+            len(process_df)
+        )
+
+        c2.metric(
+            "Sentiment",
+            process_df["teacher_sentiment"].mode()[0]
+        )
+
+        c3.metric(
+            "Emotion",
+            process_df["teacher_emotion"].mode()[0]
+        )
+
+        c4.metric(
+            "Panjang Rata-rata",
+            round(
+                process_df["final_text"]
+                .str.len()
+                .mean()
+            )
+        )
+
+        st.markdown("---")
+
+        st.subheader("Distribusi Sentiment")
+
+        sentiment_chart(process_df)
+
+        st.markdown("---")
+
+        st.subheader("Distribusi Emotion")
+
+        emotion_chart(process_df)
+
+        st.markdown("---")
+
+        st.subheader("Cross Tab Sentiment vs Emotion")
+
+        sentiment_vs_emotion(process_df)
+
+        st.markdown("---")
+
+        st.subheader("Top 20 Words")
+
+        top_words(process_df)
+
+        st.markdown("---")
+
+        st.download_button(
+
+            "📥 Download Hasil Analisis",
+
+            process_df.to_csv(index=False),
+
+            "hasil_analisis.csv",
+
+            "text/csv"
+
+        )
