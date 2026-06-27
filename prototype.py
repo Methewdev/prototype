@@ -886,7 +886,7 @@ with tab5:
             process_df.loc[idx,"token"]
         )
 # =====================================================
-# TAB 6 : STOPWORD
+# TAB 6 : STOPWORD REMOVAL
 # =====================================================
 
 with tab6:
@@ -895,52 +895,69 @@ with tab6:
 
     if st.session_state.processed_df is None:
 
-        st.warning("Silakan klik Jalankan Analisis.")
+        st.warning("Silakan klik **Jalankan Analisis** terlebih dahulu.")
 
     else:
 
         process_df = st.session_state.processed_df
 
+        # ==========================================
+        # Membuat DataFrame Preview
+        # ==========================================
+
+        preview = process_df[
+            [
+                "token",
+                "stopword"
+            ]
+        ].copy()
+
+        preview.columns = [
+            "Sebelum Stopword",
+            "Sesudah Stopword"
+        ]
+
+        # Tambahkan nomor urut
+        preview.insert(
+            0,
+            "No",
+            range(1, len(preview) + 1)
+        )
+
+        st.subheader("📋 Hasil Stopword Removal")
+
         st.dataframe(
-
-            process_df[
-                [
-                    "token",
-                    "stopword"
-                ]
-                # Tambahkan nomor urut
-                preview.insert(
-                0,
-                "No",
-                range(1, len(preview) + 1)
-            )
-            ],
-
+            preview,
             width="stretch",
             hide_index=True
-
         )
+
+        st.markdown("---")
+
+        # ==========================================
+        # Detail Perubahan
+        # ==========================================
+
+        st.subheader("📄 Detail Perubahan")
 
         idx = st.number_input(
-
-            "Index",
-
-            0,
-
-            len(process_df)-1,
-
-            0,
-
+            "Pilih Index",
+            min_value=0,
+            max_value=len(process_df) - 1,
+            value=0,
             key="stop"
-
         )
+
+        st.write("### Sebelum Stopword Removal")
 
         st.info(
-            process_df.loc[idx,"token"]
+            process_df.loc[idx, "token"]
         )
 
+        st.write("### Sesudah Stopword Removal")
+
         st.success(
-            process_df.loc[idx,"stopword"]
+            process_df.loc[idx, "stopword"]
         )
 # =====================================================
 # TAB 7 : STEMMING
