@@ -103,15 +103,15 @@ app_name = st.sidebar.selectbox(
 
 total_review = st.sidebar.slider(
     "Jumlah Review",
-    min_value=100,
-    max_value=3000,
-    value=500,
-    step=100
+    100,
+    3000,
+    500,
+    100
 )
 
 if st.sidebar.button("🌐 Scraping Review"):
 
-    with st.spinner("Mengambil data dari Google Play..."):
+    with st.spinner("Mengambil review..."):
 
         df = scrape_google_play(
             app_name,
