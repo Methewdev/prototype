@@ -1,24 +1,81 @@
 """
 =====================================================
-DASHBOARD
+DASHBOARD MODULE
+=====================================================
+Dashboard Analytics
 =====================================================
 """
 
 import streamlit as st
-import plotly.express as px
 import pandas as pd
+import plotly.express as px
 
 # =====================================================
-# SENTIMENT
+# METRIC CARD
+# =====================================================
+
+def dashboard_metrics(df):
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    col1.metric(
+        "Jumlah Review",
+        len(df)
+    )
+
+    col2.metric(
+        "Sentiment Dominan",
+        df["teacher_sentiment"].mode()[0]
+    )
+
+    col3.metric(
+        "Emosi Dominan",
+        df["teacher_emotion"].mode()[0]
+    )
+
+    col4.metric(
+        "Rata-rata Panjang Review",
+        round(
+            df["final_text"]
+            .str.len()
+            .mean()
+        )
+    )
+
+
+# =====================================================
+# PIE SENTIMENT
 # =====================================================
 
 def sentiment_chart(df):
 
+    sentiment = (
+
+        df["teacher_sentiment"]
+
+        .value_counts()
+
+        .reset_index()
+
+    )
+
+    sentiment.columns = [
+
+        "Sentiment",
+
+        "Jumlah"
+
+    ]
+
     fig = px.pie(
 
-        df,
+        sentiment,
 
-        names="teacher_sentiment",
+        names="Sentiment",
+
+        values="Jumlah",
+
+        hole=0.4,
 
         title="Distribusi Sentiment"
 
@@ -29,23 +86,36 @@ def sentiment_chart(df):
         width="stretch"
     )
 
+
 # =====================================================
-# EMOTION
+# BAR EMOTION
 # =====================================================
 
 def emotion_chart(df):
 
-    emo = (
+    emotion_order = [
+        "Senang",
+        "Netral",
+        "Marah",
+        "Frustasi"
+    ]
+
+    emotion = (
 
         df["teacher_emotion"]
 
         .value_counts()
 
+        .reindex(
+            emotion_order,
+            fill_value=0
+        )
+
         .reset_index()
 
     )
 
-    emo.columns = [
+    emotion.columns = [
 
         "Emotion",
 
@@ -55,13 +125,23 @@ def emotion_chart(df):
 
     fig = px.bar(
 
-        emo,
+        emotion,
 
         x="Emotion",
 
         y="Jumlah",
 
-        text="Jumlah"
+        text="Jumlah",
+
+        title="Distribusi Emosi"
+
+    )
+
+    fig.update_layout(
+
+        xaxis_title="Emosi",
+
+        yaxis_title="Jumlah Review"
 
     )
 
@@ -70,11 +150,24 @@ def emotion_chart(df):
         width="stretch"
     )
 
+
 # =====================================================
 # CROSSTAB
 # =====================================================
 
 def sentiment_vs_emotion(df):
+
+    emotion_order = [
+
+        "Senang",
+
+        "Netral",
+
+        "Marah",
+
+        "Frustasi"
+
+    ]
 
     cross = pd.crosstab(
 
@@ -84,13 +177,22 @@ def sentiment_vs_emotion(df):
 
     )
 
+    cross = cross.reindex(
+
+        columns=emotion_order,
+
+        fill_value=0
+
+    )
+
     st.dataframe(
         cross,
         width="stretch"
     )
 
+
 # =====================================================
-# TOP WORD
+# TOP WORDS
 # =====================================================
 
 def top_words(df):
@@ -113,9 +215,9 @@ def top_words(df):
 
     freq.columns = [
 
-        "Word",
+        "Kata",
 
-        "Frequency"
+        "Frekuensi"
 
     ]
 
@@ -123,15 +225,36 @@ def top_words(df):
 
         freq,
 
-        x="Word",
+        x="Kata",
 
-        y="Frequency",
+        y="Frekuensi",
 
-        text="Frequency"
+        text="Frekuensi",
+
+        title="20 Kata Terbanyak"
 
     )
 
     st.plotly_chart(
         fig,
         width="stretch"
+    )
+
+
+# =====================================================
+# DOWNLOAD
+# =====================================================
+
+def download_result(df):
+
+    st.download_button(
+
+        label="📥 Download Hasil Analisis",
+
+        data=df.to_csv(index=False),
+
+        file_name="hasil_analisis.csv",
+
+        mime="text/csv"
+
     )
