@@ -27,7 +27,8 @@ from mdoules.teacher import (
 
 from mdoules.indobert import (
     tokenizer_process,
-    embedding_process
+    embedding_process,
+    clustering_process
 )
 
 from mdoules.dashboard import (
