@@ -820,7 +820,7 @@ with tab5:
                 "normalisasi",
                 "token"
             ]
-        ]
+        ].copy()
         # Tambahkan nomor urut
         preview.insert(
             0,
@@ -1042,19 +1042,25 @@ with tab9:
 
         process_df = st.session_state.processed_df
 
-        st.dataframe(
+      preview = process_df[
+    [
+        "final_text",
+        "teacher_sentiment",
+        "sentiment_score"
+    ]
+    ].copy()
 
-            process_df[
-                [
-                    "final_text",
-                    "teacher_emotion",
-                    "emotion_score"
-                ]
-            ],
+    preview.insert(
+    0,
+    "No",
+    range(1, len(preview) + 1)
+    )
 
-            width="stretch"
-
-        )
+    st.dataframe(
+    preview,
+    width="stretch",
+    hide_index=True
+    )
 # =====================================================
 # TAB 10 : INDOBERT TOKENIZER
 # =====================================================
