@@ -284,6 +284,7 @@ def preview_result(df):
 
     st.subheader("📄 Preview Hasil Analisis")
 
+    # Copy dataframe
     preview = df.copy()
 
     # Tambahkan nomor urut
@@ -293,33 +294,121 @@ def preview_result(df):
         range(1, len(preview) + 1)
     )
 
-    # Ubah nama kolom agar lebih rapi
+    # Ubah nama kolom agar lebih mudah dibaca
     preview = preview.rename(
         columns={
+
             "userName": "User",
+
             "score": "Rating",
+
             "content": "Review",
+
             "tanggal": "Tanggal",
+
             "cleaning": "Cleaning",
+
             "casefold": "Case Folding",
+
             "normalisasi": "Normalisasi",
+
             "token": "Token",
+
             "stopword": "Stopword",
+
             "stemming": "Stemming",
+
             "final_text": "Final Text",
+
             "teacher_sentiment": "Sentiment",
+
             "sentiment_score": "Sentiment Score",
+
             "teacher_emotion": "Emotion",
+
             "emotion_score": "Emotion Score"
+
         }
     )
 
     st.write(f"**Total Data : {len(preview):,} Review**")
 
     st.dataframe(
+
         preview,
+
         width="stretch",
-        hide_index=True
+
+        hide_index=True,
+
+        column_config={
+
+            "No": st.column_config.NumberColumn(
+                width="small"
+            ),
+
+            "User": st.column_config.TextColumn(
+                width="medium"
+            ),
+
+            "Rating": st.column_config.NumberColumn(
+                width="small"
+            ),
+
+            "Review": st.column_config.TextColumn(
+                width="large"
+            ),
+
+            "Tanggal": st.column_config.TextColumn(
+                width="medium"
+            ),
+
+            "Cleaning": st.column_config.TextColumn(
+                width="large"
+            ),
+
+            "Case Folding": st.column_config.TextColumn(
+                width="large"
+            ),
+
+            "Normalisasi": st.column_config.TextColumn(
+                width="large"
+            ),
+
+            "Token": st.column_config.TextColumn(
+                width="large"
+            ),
+
+            "Stopword": st.column_config.TextColumn(
+                width="large"
+            ),
+
+            "Stemming": st.column_config.TextColumn(
+                width="large"
+            ),
+
+            "Final Text": st.column_config.TextColumn(
+                width="large"
+            ),
+
+            "Sentiment": st.column_config.TextColumn(
+                width="small"
+            ),
+
+            "Sentiment Score": st.column_config.NumberColumn(
+                format="%.4f"
+            ),
+
+            "Emotion": st.column_config.TextColumn(
+                width="small"
+            ),
+
+            "Emotion Score": st.column_config.NumberColumn(
+                format="%.4f"
+            )
+
+        }
+
     )
 # =====================================================
 # DOWNLOAD CSV
@@ -327,15 +416,46 @@ def preview_result(df):
 
 def download_result(df):
 
-    st.subheader("📥 Download Hasil")
+    download_df = df.copy()
 
-    csv = df.to_csv(
+    download_df.insert(
+        0,
+        "No",
+        range(1, len(download_df)+1)
+    )
+
+    download_df = download_df.rename(
+        columns={
+            "userName":"User",
+            "score":"Rating",
+            "content":"Review",
+            "tanggal":"Tanggal",
+            "cleaning":"Cleaning",
+            "casefold":"Case Folding",
+            "normalisasi":"Normalisasi",
+            "token":"Token",
+            "stopword":"Stopword",
+            "stemming":"Stemming",
+            "final_text":"Final Text",
+            "teacher_sentiment":"Sentiment",
+            "sentiment_score":"Sentiment Score",
+            "teacher_emotion":"Emotion",
+            "emotion_score":"Emotion Score"
+        }
+    )
+
+    csv = download_df.to_csv(
         index=False
     ).encode("utf-8")
 
     st.download_button(
-        label="📥 Download Hasil Analisis (.csv)",
-        data=csv,
-        file_name="hasil_analisis.csv",
-        mime="text/csv"
+
+        "📥 Download Hasil Analisis",
+
+        csv,
+
+        "hasil_analisis.csv",
+
+        "text/csv"
+
     )
