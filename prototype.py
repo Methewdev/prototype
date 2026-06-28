@@ -1012,20 +1012,25 @@ with tab8:
 
         process_df = st.session_state.processed_df
 
-        st.dataframe(
+        preview = process_df[
+            [
+                "final_text",
+                "teacher_sentiment",
+                "sentiment_score"
+            ]
+        ].copy()
 
-            process_df[
-                [
-                    "final_text",
-                    "teacher_sentiment",
-                    "sentiment_score"
-                ]
-            ],
-
-            width="stretch"
-
+        preview.insert(
+            0,
+            "No",
+            range(1, len(preview) + 1)
         )
 
+        st.dataframe(
+            preview,
+            width="stretch",
+            hide_index=True
+        )
 # =====================================================
 # TAB 9 Teacher Emotion
 # =====================================================
