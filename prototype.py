@@ -1196,7 +1196,9 @@ with tab12:
     st.header("📈 Dashboard Analytics")
 
     process_df = st.session_state.processed_df
+    st.write(type(process_df))
 
+    st.write(process_df)
     dashboard_metrics(process_df)
 
     st.markdown("---")
