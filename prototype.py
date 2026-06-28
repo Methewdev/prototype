@@ -1195,40 +1195,55 @@ with tab12:
 
     st.header("📈 Dashboard Analytics")
 
-    process_df = st.session_state.processed_df
-    st.write(type(process_df))
+    if st.session_state.processed_df is None:
 
-    st.write(process_df)
-    dashboard_metrics(process_df)
+        st.warning("Silakan klik **Jalankan Analisis** terlebih dahulu.")
 
-    st.markdown("---")
+    else:
 
-    sentiment_chart(process_df)
+        process_df = st.session_state.processed_df
 
-    st.markdown("---")
+        # Debug
+        st.write("Type :", type(process_df))
 
-    emotion_chart(process_df)
+        if not isinstance(process_df, pd.DataFrame):
 
-    st.markdown("---")
+            st.error(
+                f"processed_df bukan DataFrame tetapi {type(process_df)}"
+            )
 
-    sentiment_vs_emotion(process_df)
+            st.stop()
 
-    st.markdown("---")
+        dashboard_metrics(process_df)
 
-    sentiment_table(process_df)
+        st.markdown("---")
 
-    st.markdown("---")
+        sentiment_chart(process_df)
 
-    emotion_table(process_df)
+        st.markdown("---")
 
-    st.markdown("---")
+        emotion_chart(process_df)
 
-    top_words(process_df)
+        st.markdown("---")
 
-    st.markdown("---")
+        sentiment_vs_emotion(process_df)
 
-    preview_result(process_df)
+        st.markdown("---")
 
-    st.markdown("---")
+        sentiment_table(process_df)
 
-    download_result(process_df)
+        st.markdown("---")
+
+        emotion_table(process_df)
+
+        st.markdown("---")
+
+        top_words(process_df)
+
+        st.markdown("---")
+
+        preview_result(process_df)
+
+        st.markdown("---")
+
+        download_result(process_df)
