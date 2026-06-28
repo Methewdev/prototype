@@ -1063,8 +1063,8 @@ with tab9:
 
     st.dataframe(
         preview,
-    width="stretch",
-    hide_index=True
+        width="stretch",
+        hide_index=True
     )
 # =====================================================
 # TAB 10 : INDOBERT TOKENIZER
