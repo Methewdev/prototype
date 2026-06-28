@@ -1026,7 +1026,7 @@ with tab8:
             range(1, len(preview) + 1)
         )
 
-        st.dataframe(
+            st.dataframe(
             preview,
             width="stretch",
             hide_index=True
