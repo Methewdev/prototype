@@ -1010,23 +1010,23 @@ with tab8:
 
     else:
 
-            process_df = st.session_state.processed_df
+        process_df = st.session_state.processed_df
 
-            preview = process_df[
-       [
+        preview = process_df[
+           [
                 "final_text",
                 "teacher_sentiment",
                 "sentiment_score"
-        ]
+            ]
         ].copy()
 
-            preview.insert(
+        preview.insert(
             0,
             "No",
             range(1, len(preview) + 1)
         )
 
-            st.dataframe(
+        st.dataframe(
             preview,
             width="stretch",
             hide_index=True
