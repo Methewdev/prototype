@@ -1020,7 +1020,7 @@ with tab8:
         ]
         ].copy()
 
-        preview.insert(
+            preview.insert(
             0,
             "No",
             range(1, len(preview) + 1)
