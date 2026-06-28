@@ -1047,7 +1047,7 @@ with tab9:
 
         process_df = st.session_state.processed_df
 
-          preview = process_df[
+        preview = process_df[
     [
         "final_text",
         "teacher_sentiment",
