@@ -1195,42 +1195,38 @@ with tab12:
 
     st.header("📈 Dashboard Analytics")
 
-    if st.session_state.processed_df is None:
+    process_df = st.session_state.processed_df
 
-        st.warning(
-            "Silakan klik Jalankan Analisis."
-        )
+    dashboard_metrics(process_df)
 
-    else:
+    st.markdown("---")
 
-        process_df = st.session_state.processed_df
+    sentiment_chart(process_df)
 
-        dashboard_metrics(process_df)
+    st.markdown("---")
 
-        st.markdown("---")
+    emotion_chart(process_df)
 
-        col1, col2 = st.columns(2)
+    st.markdown("---")
 
-        with col1:
+    sentiment_vs_emotion(process_df)
 
-            sentiment_chart(process_df)
+    st.markdown("---")
 
-        with col2:
+    sentiment_table(process_df)
 
-            emotion_chart(process_df)
+    st.markdown("---")
 
-        st.markdown("---")
+    emotion_table(process_df)
 
-        st.subheader("📊 Sentiment vs Emotion")
+    st.markdown("---")
 
-        sentiment_vs_emotion(process_df)
+    top_words(process_df)
 
-        st.markdown("---")
+    st.markdown("---")
 
-        st.subheader("🔤 Top 20 Words")
+    preview_result(process_df)
 
-        top_words(process_df)
+    st.markdown("---")
 
-        st.markdown("---")
-
-        download_result(process_df)
+    download_result(process_df)
