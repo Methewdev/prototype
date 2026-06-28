@@ -321,31 +321,6 @@ def preview_result(df):
         width="stretch",
         hide_index=True
     )
-from st_aggrid import AgGrid
-from st_aggrid import GridOptionsBuilder
-
-gb = GridOptionsBuilder.from_dataframe(preview)
-
-gb.configure_pagination(
-    paginationAutoPageSize=False,
-    paginationPageSize=20
-)
-
-gb.configure_default_column(
-    filter=True,
-    sortable=True,
-    resizable=True
-)
-
-gridOptions = gb.build()
-
-AgGrid(
-    preview,
-    gridOptions=gridOptions,
-    fit_columns_on_grid_load=False,
-    height=600
-)
-
 # =====================================================
 # DOWNLOAD CSV
 # =====================================================
