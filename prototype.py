@@ -1062,7 +1062,7 @@ with tab9:
     )
 
     st.dataframe(
-    preview,
+        preview,
     width="stretch",
     hide_index=True
     )
