@@ -1211,22 +1211,13 @@ with tab12:
 
     if st.session_state.processed_df is None:
 
-        st.warning("Silakan klik **Jalankan Analisis** terlebih dahulu.")
+        st.warning(
+            "Silakan klik **Jalankan Analisis** terlebih dahulu."
+        )
 
     else:
 
         process_df = st.session_state.processed_df
-
-        # Debug
-        st.write("Type :", type(process_df))
-
-        if not isinstance(process_df, pd.DataFrame):
-
-            st.error(
-                f"processed_df bukan DataFrame tetapi {type(process_df)}"
-            )
-
-            st.stop()
 
         dashboard_metrics(process_df)
 
