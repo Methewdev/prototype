@@ -3,10 +3,13 @@
 INDOBERT MODULE
 =====================================================
 """
-
+from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
+from sklearn.metrics import silhouette_score
 import torch
 import pandas as pd
 import streamlit as st
+import numpy as np
 
 from transformers import (
     AutoTokenizer,
@@ -62,30 +65,97 @@ def tokenizer_process(text):
 # EMBEDDING
 # =====================================================
 
-def embedding_process(text):
+# =====================================================
+# EMBEDDING DATASET
+# =====================================================
+
+def embedding_dataset(df):
 
     tokenizer, model = load_indobert()
 
-    inputs = tokenizer(
+    embeddings = []
 
-        text,
+    for text in df["final_text"].astype(str):
 
-        return_tensors="pt",
+        inputs = tokenizer(
+            text,
+            return_tensors="pt",
+            truncation=True,
+            padding="max_length",
+            max_length=128
+        )
 
-        truncation=True,
+        with torch.no_grad():
 
-        padding=True
+            outputs = model(**inputs)
+
+        cls_embedding = (
+            outputs.last_hidden_state[:, 0, :]
+            .cpu()
+            .numpy()[0]
+        )
+
+        embeddings.append(cls_embedding)
+
+    return np.array(embeddings)
+# =====================================================
+# KMEANS CLUSTERING
+# =====================================================
+
+def clustering_process(df, n_cluster=3):
+
+    X = embedding_dataset(df)
+
+    kmeans = KMeans(
+
+        n_clusters=n_cluster,
+
+        random_state=42,
+
+        n_init="auto"
 
     )
 
-    with torch.no_grad():
+    cluster = kmeans.fit_predict(X)
 
-        outputs = model(**inputs)
+    df["cluster"] = cluster
 
-    cls = outputs.last_hidden_state[:,0,:]
+    cluster_name = {
 
-    embedding = cls.cpu().numpy()
+        0:"Cluster 1",
 
-    return pd.DataFrame(
-        embedding
+        1:"Cluster 2",
+
+        2:"Cluster 3"
+
+    }
+
+    df["cluster_name"] = (
+
+        df["cluster"]
+
+        .map(cluster_name)
+
     )
+
+    score = silhouette_score(
+
+        X,
+
+        cluster
+
+    )
+
+    pca = PCA(
+
+        n_components=2
+
+    )
+
+    pca_result = pca.fit_transform(X)
+
+    df["PCA1"] = pca_result[:,0]
+
+    df["PCA2"] = pca_result[:,1]
+
+    return df, score
