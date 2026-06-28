@@ -1053,19 +1053,19 @@ with tab9:
                 "teacher_sentiment",
                 "sentiment_score"
             ]
-    ].copy()
+        ].copy()
 
         preview.insert(
             0,
             "No",
             range(1, len(preview) + 1)
-    )
+        )
 
-    st.dataframe(
-        preview,
-        width="stretch",
-        hide_index=True
-    )
+        st.dataframe(
+            preview,
+            width="stretch",
+            hide_index=True
+        )
 # =====================================================
 # TAB 10 : INDOBERT TOKENIZER
 # =====================================================
