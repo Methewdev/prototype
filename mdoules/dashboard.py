@@ -10,57 +10,19 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-"""
-=====================================================
-DASHBOARD MODULE
-=====================================================
-Dashboard Analytics
-=====================================================
-"""
-
-import streamlit as st
-import pandas as pd
-import plotly.express as px
-
 # =====================================================
 # DASHBOARD METRICS
 # =====================================================
-process_df = st.session_state.processed_df
+
 def dashboard_metrics(df):
 
-    # ==============================
-    # DEBUG
-    # ==============================
-
-    st.write("### DEBUG Dashboard")
-
-    st.write("Type :", type(df))
-
     if df is None:
-
-        st.error("processed_df = None")
-
-        return
-
-    if not isinstance(df, pd.DataFrame):
-
-        st.error(
-            f"processed_df bukan DataFrame tetapi {type(df)}"
-        )
-
-        st.write(df)
-
+        st.warning("Belum ada data hasil analisis.")
         return
 
     if df.empty:
-
-        st.warning("DataFrame kosong")
-
+        st.warning("Dataset kosong.")
         return
-
-    # ==============================
-    # Metric
-    # ==============================
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -82,17 +44,18 @@ def dashboard_metrics(df):
     col4.metric(
         "Rata-rata Panjang Review",
         round(
-            df["final_text"]
-            .str.len()
-            .mean()
+            df["final_text"].astype(str).str.len().mean()
         )
     )
+
 
 # =====================================================
 # PIE CHART SENTIMENT
 # =====================================================
 
 def sentiment_chart(df):
+
+    st.subheader("🥧 Distribusi Sentiment")
 
     sentiment = (
         df["teacher_sentiment"]
@@ -124,6 +87,8 @@ def sentiment_chart(df):
 # =====================================================
 
 def emotion_chart(df):
+
+    st.subheader("😊 Distribusi Emosi")
 
     emotion_order = [
         "Senang",
@@ -167,10 +132,12 @@ def emotion_chart(df):
 
 
 # =====================================================
-# CROSSTAB SENTIMENT vs EMOTION
+# CROSSTAB
 # =====================================================
 
 def sentiment_vs_emotion(df):
+
+    st.subheader("📊 Crosstab Sentiment vs Emotion")
 
     emotion_order = [
         "Senang",
@@ -189,8 +156,6 @@ def sentiment_vs_emotion(df):
         fill_value=0
     )
 
-    st.subheader("📊 Crosstab Sentiment vs Emotion")
-
     st.dataframe(
         cross,
         width="stretch"
@@ -203,7 +168,7 @@ def sentiment_vs_emotion(df):
 
 def sentiment_table(df):
 
-    st.subheader("📋 Statistik Sentiment")
+    st.subheader("📈 Statistik Sentiment")
 
     sentiment = (
         df["teacher_sentiment"]
@@ -217,15 +182,15 @@ def sentiment_table(df):
     ]
 
     sentiment["Persentase (%)"] = (
-        sentiment["Jumlah"] /
-        sentiment["Jumlah"].sum()
+        sentiment["Jumlah"]
+        / sentiment["Jumlah"].sum()
         * 100
     ).round(2)
 
     sentiment.insert(
         0,
         "No",
-        range(1, len(sentiment)+1)
+        range(1, len(sentiment) + 1)
     )
 
     st.dataframe(
@@ -241,7 +206,7 @@ def sentiment_table(df):
 
 def emotion_table(df):
 
-    st.subheader("😊 Statistik Emosi")
+    st.subheader("📈 Statistik Emosi")
 
     emotion = (
         df["teacher_emotion"]
@@ -255,15 +220,15 @@ def emotion_table(df):
     ]
 
     emotion["Persentase (%)"] = (
-        emotion["Jumlah"] /
-        emotion["Jumlah"].sum()
+        emotion["Jumlah"]
+        / emotion["Jumlah"].sum()
         * 100
     ).round(2)
 
     emotion.insert(
         0,
         "No",
-        range(1, len(emotion)+1)
+        range(1, len(emotion) + 1)
     )
 
     st.dataframe(
@@ -279,8 +244,10 @@ def emotion_table(df):
 
 def top_words(df):
 
+    st.subheader("🔥 20 Kata Terbanyak")
+
     words = " ".join(
-        df["final_text"]
+        df["final_text"].astype(str)
     ).split()
 
     freq = (
@@ -300,7 +267,7 @@ def top_words(df):
         x="Kata",
         y="Frekuensi",
         text="Frekuensi",
-        title="20 Kata Terbanyak"
+        title="Top 20 Words"
     )
 
     st.plotly_chart(
@@ -315,7 +282,7 @@ def top_words(df):
 
 def preview_result(df):
 
-    st.subheader("📄 Hasil Analisis")
+    st.subheader("📄 Preview Hasil Analisis")
 
     preview = df[
         [
@@ -338,11 +305,11 @@ def preview_result(df):
     preview.insert(
         0,
         "No",
-        range(1, len(preview)+1)
+        range(1, len(preview) + 1)
     )
 
     st.write(
-        f"Total Data : **{len(preview):,} Review**"
+        f"Total Data : {len(preview):,} Review"
     )
 
     st.dataframe(
@@ -358,293 +325,14 @@ def preview_result(df):
 
 def download_result(df):
 
-    csv = df.to_csv(
-        index=False
-    ).encode("utf-8")
-
-    st.download_button(
-        label="📥 Download Hasil Analisis",
-        data=csv,
-        file_name="hasil_analisis.csv",
-        mime="text/csv"
-    )
-
-# =====================================================
-# PIE CHART SENTIMENT
-# =====================================================
-
-def sentiment_chart(df):
-
-    sentiment = (
-        df["teacher_sentiment"]
-        .value_counts()
-        .reset_index()
-    )
-
-    sentiment.columns = [
-        "Sentiment",
-        "Jumlah"
-    ]
-
-    fig = px.pie(
-        sentiment,
-        names="Sentiment",
-        values="Jumlah",
-        hole=0.45,
-        title="Distribusi Sentiment"
-    )
-
-    st.plotly_chart(
-        fig,
-        width="stretch"
-    )
-
-
-# =====================================================
-# BAR CHART EMOTION
-# =====================================================
-
-def emotion_chart(df):
-
-    emotion_order = [
-        "Senang",
-        "Netral",
-        "Marah",
-        "Frustasi"
-    ]
-
-    emotion = (
-        df["teacher_emotion"]
-        .value_counts()
-        .reindex(
-            emotion_order,
-            fill_value=0
-        )
-        .reset_index()
-    )
-
-    emotion.columns = [
-        "Emosi",
-        "Jumlah"
-    ]
-
-    fig = px.bar(
-        emotion,
-        x="Emosi",
-        y="Jumlah",
-        text="Jumlah",
-        title="Distribusi Emosi"
-    )
-
-    fig.update_layout(
-        xaxis_title="Emosi",
-        yaxis_title="Jumlah Review"
-    )
-
-    st.plotly_chart(
-        fig,
-        width="stretch"
-    )
-
-
-# =====================================================
-# CROSSTAB SENTIMENT vs EMOTION
-# =====================================================
-
-def sentiment_vs_emotion(df):
-
-    emotion_order = [
-        "Senang",
-        "Netral",
-        "Marah",
-        "Frustasi"
-    ]
-
-    cross = pd.crosstab(
-        df["teacher_sentiment"],
-        df["teacher_emotion"]
-    )
-
-    cross = cross.reindex(
-        columns=emotion_order,
-        fill_value=0
-    )
-
-    st.subheader("📊 Crosstab Sentiment vs Emotion")
-
-    st.dataframe(
-        cross,
-        width="stretch"
-    )
-
-
-# =====================================================
-# STATISTIK SENTIMENT
-# =====================================================
-
-def sentiment_table(df):
-
-    st.subheader("📋 Statistik Sentiment")
-
-    sentiment = (
-        df["teacher_sentiment"]
-        .value_counts()
-        .reset_index()
-    )
-
-    sentiment.columns = [
-        "Sentiment",
-        "Jumlah"
-    ]
-
-    sentiment["Persentase (%)"] = (
-        sentiment["Jumlah"] /
-        sentiment["Jumlah"].sum()
-        * 100
-    ).round(2)
-
-    sentiment.insert(
-        0,
-        "No",
-        range(1, len(sentiment)+1)
-    )
-
-    st.dataframe(
-        sentiment,
-        width="stretch",
-        hide_index=True
-    )
-
-
-# =====================================================
-# STATISTIK EMOTION
-# =====================================================
-
-def emotion_table(df):
-
-    st.subheader("😊 Statistik Emosi")
-
-    emotion = (
-        df["teacher_emotion"]
-        .value_counts()
-        .reset_index()
-    )
-
-    emotion.columns = [
-        "Emosi",
-        "Jumlah"
-    ]
-
-    emotion["Persentase (%)"] = (
-        emotion["Jumlah"] /
-        emotion["Jumlah"].sum()
-        * 100
-    ).round(2)
-
-    emotion.insert(
-        0,
-        "No",
-        range(1, len(emotion)+1)
-    )
-
-    st.dataframe(
-        emotion,
-        width="stretch",
-        hide_index=True
-    )
-
-
-# =====================================================
-# TOP 20 WORDS
-# =====================================================
-
-def top_words(df):
-
-    words = " ".join(
-        df["final_text"]
-    ).split()
-
-    freq = (
-        pd.Series(words)
-        .value_counts()
-        .head(20)
-        .reset_index()
-    )
-
-    freq.columns = [
-        "Kata",
-        "Frekuensi"
-    ]
-
-    fig = px.bar(
-        freq,
-        x="Kata",
-        y="Frekuensi",
-        text="Frekuensi",
-        title="20 Kata Terbanyak"
-    )
-
-    st.plotly_chart(
-        fig,
-        width="stretch"
-    )
-
-
-# =====================================================
-# PREVIEW HASIL ANALISIS
-# =====================================================
-
-def preview_result(df):
-
-    st.subheader("📄 Hasil Analisis")
-
-    preview = df[
-        [
-            "userName",
-            "score",
-            "content",
-            "teacher_sentiment",
-            "teacher_emotion"
-        ]
-    ].copy()
-
-    preview.columns = [
-        "Username",
-        "Rating",
-        "Review",
-        "Sentiment",
-        "Emotion"
-    ]
-
-    preview.insert(
-        0,
-        "No",
-        range(1, len(preview)+1)
-    )
-
-    st.write(
-        f"Total Data : **{len(preview):,} Review**"
-    )
-
-    st.dataframe(
-        preview,
-        width="stretch",
-        hide_index=True
-    )
-
-
-# =====================================================
-# DOWNLOAD CSV
-# =====================================================
-
-def download_result(df):
+    st.subheader("📥 Download Hasil")
 
     csv = df.to_csv(
         index=False
     ).encode("utf-8")
 
     st.download_button(
-        label="📥 Download Hasil Analisis",
+        label="📥 Download Hasil Analisis (.csv)",
         data=csv,
         file_name="hasil_analisis.csv",
         mime="text/csv"
