@@ -35,7 +35,10 @@ from mdoules.dashboard import (
     sentiment_chart,
     emotion_chart,
     sentiment_vs_emotion,
+    sentiment_table,
+    emotion_table,
     top_words,
+    preview_result,
     download_result
 )
 from mdoules.scraper import (
