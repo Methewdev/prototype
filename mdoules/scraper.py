@@ -15,18 +15,6 @@ APP_MAPPING = {
     "Livin' by Mandiri":
         "id.bmri.livin",
 
-    "BRImo":
-        "id.co.bri.brimo",
-
-    "myBCA":
-        "com.bca.mybca.omni.android",
-
-    "SeaBank":
-        "com.seabank.seabank",
-
-    "Jenius":
-        "com.btpn.dc"
-
 }
 
 
