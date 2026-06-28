@@ -46,6 +46,10 @@ from mdoules.scraper import (
     scrape_google_play,
     APP_MAPPING
 )
+from mdoules.clustering import (
+    clustering_process,
+    cluster_summary
+)
 # =====================================================
 # PAGE CONFIG
 # =====================================================
@@ -181,10 +185,16 @@ if run:
         process_df = teacher_pipeline(
             process_df
         )
+            process_df, silhouette_score_value, kmeans_model = clustering_process(
+            process_df,
+            n_cluster=3
+        )
 
-    st.session_state.processed_df = process_df
+            st.session_state.silhouette = silhouette_score_value
+            st.session_state.cluster_summary = cluster_summary(process_df)
+            st.session_state.processed_df = process_df
 
-    st.success(
+        st.success(
         "Analisis berhasil dilakukan."
     )
 
