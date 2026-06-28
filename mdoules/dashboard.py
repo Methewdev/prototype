@@ -284,40 +284,67 @@ def preview_result(df):
 
     st.subheader("📄 Preview Hasil Analisis")
 
-    preview = df[
-        [
-            "userName",
-            "score",
-            "content",
-            "teacher_sentiment",
-            "teacher_emotion"
-        ]
-    ].copy()
+    preview = df.copy()
 
-    preview.columns = [
-        "Username",
-        "Rating",
-        "Review",
-        "Sentiment",
-        "Emotion"
-    ]
-
+    # Tambahkan nomor urut
     preview.insert(
         0,
         "No",
         range(1, len(preview) + 1)
     )
 
-    st.write(
-        f"Total Data : {len(preview):,} Review"
+    # Ubah nama kolom agar lebih rapi
+    preview = preview.rename(
+        columns={
+            "userName": "User",
+            "score": "Rating",
+            "content": "Review",
+            "tanggal": "Tanggal",
+            "cleaning": "Cleaning",
+            "casefold": "Case Folding",
+            "normalisasi": "Normalisasi",
+            "token": "Token",
+            "stopword": "Stopword",
+            "stemming": "Stemming",
+            "final_text": "Final Text",
+            "teacher_sentiment": "Sentiment",
+            "sentiment_score": "Sentiment Score",
+            "teacher_emotion": "Emotion",
+            "emotion_score": "Emotion Score"
+        }
     )
+
+    st.write(f"**Total Data : {len(preview):,} Review**")
 
     st.dataframe(
         preview,
         width="stretch",
         hide_index=True
     )
+from st_aggrid import AgGrid
+from st_aggrid import GridOptionsBuilder
 
+gb = GridOptionsBuilder.from_dataframe(preview)
+
+gb.configure_pagination(
+    paginationAutoPageSize=False,
+    paginationPageSize=20
+)
+
+gb.configure_default_column(
+    filter=True,
+    sortable=True,
+    resizable=True
+)
+
+gridOptions = gb.build()
+
+AgGrid(
+    preview,
+    gridOptions=gridOptions,
+    fit_columns_on_grid_load=False,
+    height=600
+)
 
 # =====================================================
 # DOWNLOAD CSV
