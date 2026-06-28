@@ -173,6 +173,9 @@ run = st.sidebar.button(
 
 if run:
 
+    # ===============================
+    # PREPROCESSING
+    # ===============================
     with st.spinner("Melakukan preprocessing..."):
 
         process_df = preprocessing_pipeline(
@@ -180,22 +183,35 @@ if run:
             review_col
         )
 
+    # ===============================
+    # TEACHER MODEL
+    # ===============================
     with st.spinner("Menjalankan Teacher Model..."):
 
         process_df = teacher_pipeline(
             process_df
         )
-            process_df, silhouette_score_value, kmeans_model = clustering_process(
+
+    # ===============================
+    # K-MEANS CLUSTERING
+    # ===============================
+    with st.spinner("Melakukan K-Means Clustering..."):
+
+        process_df, silhouette_score_value, kmeans_model = clustering_process(
             process_df,
             n_cluster=3
         )
 
-            st.session_state.silhouette = silhouette_score_value
-            st.session_state.cluster_summary = cluster_summary(process_df)
-            st.session_state.processed_df = process_df
+    # ===============================
+    # SIMPAN KE SESSION STATE
+    # ===============================
+    st.session_state.processed_df = process_df
+    st.session_state.silhouette = silhouette_score_value
+    st.session_state.cluster_summary = cluster_summary(process_df)
+    st.session_state.kmeans_model = kmeans_model
 
-        st.success(
-        "Analisis berhasil dilakukan."
+    st.success(
+        "✅ Analisis berhasil dilakukan."
     )
 
 # =====================================================
