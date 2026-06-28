@@ -13,7 +13,7 @@ from google_play_scraper import Sort
 APP_MAPPING = {
 
     "Livin' by Mandiri":
-        "com.bankmandiri.mandirionline",
+        "id.bmri.livin",
 
     "BRImo":
         "id.co.bri.brimo",
