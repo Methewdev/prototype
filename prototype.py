@@ -50,7 +50,7 @@ from mdoules.scraper import (
 # =====================================================
 
 st.set_page_config(
-    page_title="AI Dashboard",
+    page_title="AI Prediction",
     page_icon="📊",
     layout="wide"
 
@@ -86,7 +86,7 @@ h1,h2,h3{
 # HEADER
 # =====================================================
 
-st.title("📊 Analysis Dashboard Sentiment and Emotion")
+st.title("📊 Customer Sentiment Analysis")
 
 st.markdown("""
 Prototype Analisis Sentiment dan Emotion Review Livin' by Mandiri
