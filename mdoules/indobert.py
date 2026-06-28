@@ -6,6 +6,7 @@ INDOBERT MODULE
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score
+
 import torch
 import pandas as pd
 import streamlit as st
@@ -61,43 +62,31 @@ def tokenizer_process(text):
 
     }
 
-# =====================================================
-# EMBEDDING
-# =====================================================
 
 # =====================================================
 # EMBEDDING DATASET
 # =====================================================
 
-def embedding_dataset(df):
+def embedding_process(text):
 
     tokenizer, model = load_indobert()
 
-    embeddings = []
+    inputs = tokenizer(
+        text,
+        return_tensors="pt",
+        truncation=True,
+        padding=True,
+        max_length=128
+    )
 
-    for text in df["final_text"].astype(str):
+    with torch.no_grad():
+        outputs = model(**inputs)
 
-        inputs = tokenizer(
-            text,
-            return_tensors="pt",
-            truncation=True,
-            padding="max_length",
-            max_length=128
-        )
+    cls_embedding = outputs.last_hidden_state[:, 0, :]
 
-        with torch.no_grad():
+    embedding = cls_embedding.cpu().numpy()
 
-            outputs = model(**inputs)
-
-        cls_embedding = (
-            outputs.last_hidden_state[:, 0, :]
-            .cpu()
-            .numpy()[0]
-        )
-
-        embeddings.append(cls_embedding)
-
-    return np.array(embeddings)
+    return pd.DataFrame(embedding)
 # =====================================================
 # KMEANS CLUSTERING
 # =====================================================
