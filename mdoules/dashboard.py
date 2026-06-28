@@ -25,10 +25,11 @@ import plotly.express as px
 # =====================================================
 # DASHBOARD METRICS
 # =====================================================
-
-def dashboard_metrics(df):
+process_df = st.session_state.processed_df
 st.write(type(process_df))
 st.write(process_df)
+def dashboard_metrics(df):
+
     # ==============================
     # DEBUG
     # ==============================
