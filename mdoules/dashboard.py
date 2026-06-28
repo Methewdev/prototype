@@ -16,6 +16,40 @@ import plotly.express as px
 
 def dashboard_metrics(df):
 
+    # ==============================
+    # DEBUG
+    # ==============================
+
+    st.write("### DEBUG Dashboard")
+
+    st.write("Type :", type(df))
+
+    if df is None:
+
+        st.error("processed_df = None")
+
+        return
+
+    if not isinstance(df, pd.DataFrame):
+
+        st.error(
+            f"processed_df bukan DataFrame tetapi {type(df)}"
+        )
+
+        st.write(df)
+
+        return
+
+    if df.empty:
+
+        st.warning("DataFrame kosong")
+
+        return
+
+    # ==============================
+    # Metric
+    # ==============================
+
     col1, col2, col3, col4 = st.columns(4)
 
     col1.metric(
@@ -25,12 +59,12 @@ def dashboard_metrics(df):
 
     col2.metric(
         "Sentiment Dominan",
-        df["teacher_sentiment"].mode()[0]
+        df["teacher_sentiment"].mode().iloc[0]
     )
 
     col3.metric(
         "Emosi Dominan",
-        df["teacher_emotion"].mode()[0]
+        df["teacher_emotion"].mode().iloc[0]
     )
 
     col4.metric(
@@ -41,7 +75,6 @@ def dashboard_metrics(df):
             .mean()
         )
     )
-
 
 # =====================================================
 # PIE CHART SENTIMENT
